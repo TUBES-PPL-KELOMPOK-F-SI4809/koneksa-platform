@@ -31,10 +31,15 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
+        <Head title="Masuk - Koneksa" />
 
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
+        </div>
+
+        <div class="mb-6 text-center">
+            <h2 class="text-2xl font-bold text-gray-900">Masuk ke Akun Anda</h2>
+            <p class="text-sm text-gray-600 mt-1">Platform Kolaborasi UMKM, Mitra Industri, & Pemda</p>
         </div>
 
         <form @submit.prevent="submit">
@@ -69,31 +74,39 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4 block">
-                <label class="flex items-center">
+            <div class="mt-4 flex items-center justify-between">
+                <label class="flex items-center cursor-pointer">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
-                    >
+                    <span class="ms-2 text-sm text-gray-600">Ingat Saya</span>
                 </label>
-            </div>
 
-            <div class="mt-4 flex items-center justify-end">
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Forgot your password?
+                    Lupa password?
                 </Link>
+            </div>
 
+            <div class="mt-6">
                 <PrimaryButton
-                    class="ms-4"
+                    class="w-full justify-center py-2.5"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Log in
+                    Masuk
                 </PrimaryButton>
+            </div>
+
+            <div class="mt-6 text-center text-sm text-gray-600">
+                Belum memiliki akun?
+                <Link
+                    :href="route('register')"
+                    class="font-semibold text-indigo-600 underline hover:text-indigo-900 ms-1"
+                >
+                    Daftar Sekarang
+                </Link>
             </div>
         </form>
     </GuestLayout>
