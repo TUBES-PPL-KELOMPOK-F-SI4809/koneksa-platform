@@ -43,6 +43,14 @@ const showingNavigationDropdown = ref(false);
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                            <!-- Badge Role Pengguna -->
+                            <span
+                                v-if="$page.props.auth.user.role"
+                                class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-700/10 uppercase tracking-wide me-1"
+                            >
+                                {{ $page.props.auth.user.role }}
+                            </span>
+
                             <!-- Settings Dropdown -->
                             <div class="relative ms-3">
                                 <Dropdown align="right" width="48">
@@ -76,12 +84,14 @@ const showingNavigationDropdown = ref(false);
                                         >
                                             Profile
                                         </DropdownLink>
+                                        <!-- Tombol Logout -->
                                         <DropdownLink
                                             :href="route('logout')"
                                             method="post"
                                             as="button"
+                                            class="text-red-600 hover:text-red-700 font-medium"
                                         >
-                                            Log Out
+                                            Keluar (Log Out)
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
