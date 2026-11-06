@@ -1,0 +1,36 @@
+# Windsurf Rules — Koneksa Platform
+
+Before generating plans, creating files, or modifying code in this repository, you MUST follow these non-negotiable rules:
+
+1. **Mandatory Pre-flight Reading**:
+   - Business Logic & 21 Features: `docs/PRD/PRD-KONEKSA-PLATFORM.md`
+   - ERD & Schema: `docs/analysis/RANCANGAN_ERD_KONEKSA.md` and `docs/analysis/DATABASE-SCHEMA.md`
+   - Architecture & Directory Standards: `docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md`
+   - Clean Code & Anti-Regression: `docs/guidelines/CLEAN-CODE.md`
+   - Design System & Tokens: `docs/design-system/BASELINE-DESIGN.md` and `docs/design-system/DESIGN-TOKENS.md`
+
+2. **Activate Domain Skills in `.agents/skills/` and `.antigravity/skills/`**:
+   - Backend: `.antigravity/skills/laravel-best-practices/`
+   - Inertia & Vue: `.antigravity/skills/inertia-vue-development/`
+   - Styling: `.antigravity/skills/tailwindcss-development/`
+   - UI Primitives: `.agents/skills/shadcn-ui/`
+   - UI/UX & Design: `.agents/skills/ui-ux-pro-max/` & `.agents/skills/taste-design/`
+   - Testing: `.antigravity/skills/testing-best-practices/`
+
+3. **No Over-Engineering (KISS & YAGNI)**:
+   - Always implement the simplest, cleanest solution that completely solves the problem.
+   - Do NOT introduce generic repository patterns, single-implementation interfaces, or speculative architecture for future needs.
+
+4. **Check Installed Dependencies First**:
+   - Always inspect `composer.json` and `package.json` before writing custom utilities or adding new dependencies.
+   - Leverage built-in Laravel tools (`Str`, `Arr`, `Carbon`, `Collection`, `Validator`) and Inertia helpers (`useForm`).
+
+5. **Mandatory Testing**:
+   - Every logic update or new feature must have corresponding unit/feature tests.
+   - Tests must pass (`php artisan test` 100% green).
+
+6. **CLI-First & Zero Regression**:
+   - Use `php artisan make:*` for file scaffolding.
+   - Never edit historical database migrations; always create new migrations.
+   - Run `vendor/bin/pint --dirty --format agent` on modified PHP files.
+

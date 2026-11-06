@@ -144,18 +144,21 @@ Detail lengkap baca di [CLEAN-CODE.md](docs/guidelines/CLEAN-CODE.md) dan [FEATU
 
 ---
 
-## 6. Aturan Wajib Ekosistem Eksisting (Ecosystem-First: No Reinventing The Wheel)
+## 6. Aturan Wajib Cek Dependensi & Ekosistem Terpasang (Check Existing Dependencies First: No Reinventing The Wheel)
 
-> **CRITICAL ECOSYSTEM RULE**: Sebelum menulis fungsi manual, helper kustom, atau algoritma buatan sendiri, **Agent WAJIB memeriksa dan memanfaatkan pustaka/dependensi yang sudah ada dalam ekosistem Laravel maupun React/Vue/NPM.**
+> **CRITICAL ECOSYSTEM & DEPENDENCY RULE**: Sebelum menulis fungsi manual, helper kustom, algoritma buatan sendiri, atau mengajukan paket eksternal baru, **Agent WAJIB memeriksa daftar dependensi yang sudah terpasang di `composer.json` dan `package.json`, serta memanfaatkan ekosistem bawaan Laravel dan Vue/NPM.** DILARANG menulis ulang fungsionalitas yang sudah tersedia secara matang di dalam repositori.
 
-### Kewajiban Pemanfaatan Ekosistem:
-1. **Pemanfaatan Ekosistem Laravel & PHP**:
+### Langkah Wajib Sebelum Menulis Kode Kustom:
+1. **Audit Dependensi Terpasang**:
+   - Backend: Periksa `composer.json` atau jalankan `composer show --direct` untuk melihat dependensi PHP yang aktif.
+   - Frontend: Periksa `package.json` untuk melihat pustaka JavaScript yang aktif.
+2. **Pemanfaatan Ekosistem Laravel & PHP**:
    - **Data Manipulation**: Selalu gunakan Laravel Collections (`collect()->map()`, `filter()`, `pluck()`, `groupBy()`) daripada loop manual `foreach` yang panjang.
    - **String & Array Helpers**: Gunakan `Illuminate\Support\Str` (misal: `Str::slug()`, `Str::uuid()`, `Str::limit()`) dan `Illuminate\Support\Arr`.
    - **Manipulasi Waktu/Tanggal**: Wajib gunakan `Carbon\Carbon` atau helper bawaan Laravel (`now()`, `today()`), dilarang memanipulasi string tanggal dengan fungsi mentah PHP `date()` atau hitungan manual unix timestamp.
    - **Autentikasi & Otorisasi**: Gunakan middleware, Gates, dan Policies bawaan Laravel, dilarang membuat sistem pengecekan role manual di controller.
    - **Database Query**: Manfaatkan fitur Eloquent ORM (Relationships, Query Scopes, Casts, Mutators) daripada menulis raw query atau logic filter berulang.
-2. **Pemanfaatan Ekosistem Frontend (React / Vue / Inertia / NPM)**:
+3. **Pemanfaatan Ekosistem Frontend (React / Vue / Inertia / NPM)**:
    - **Manajemen Form**: Wajib gunakan `useForm` dari `@inertiajs/vue3` untuk mengelola state form, error bag, reset, dan status processing. Dilarang membuat state reaktif form manual dari nol jika useForm mencukupi.
    - **Komponen UI**: Cek katalog `shadcn-ui` terlebih dahulu (Lihat Aturan 2).
    - **Iconography**: Manfaatkan library ikon yang terpasang (seperti Lucide Icons) daripada membuat SVG manual.
@@ -189,6 +192,26 @@ Detail lengkap baca di [CLEAN-CODE.md](docs/guidelines/CLEAN-CODE.md) dan [FEATU
    - Instal dependensi PHP: `composer require vendor/package`
    - Instal dependensi JS: `npm install package-name`
    - Audit keamanan: `composer audit` dan `npm audit`
+
+---
+
+## 8. Aturan Anti Over-Engineering (KISS & YAGNI Mandate: Keep It Simple & Practical)
+
+> **CRITICAL ANTI OVER-ENGINEERING MANDATE**: Agent **DILARANG KERAS melakukan over-engineering, over-abstraction, atau premature optimization**. Terapkan prinsip **KISS (Keep It Simple, Stupid)** dan **YAGNI (You Aren't Gonna Need It)** dalam setiap baris kode yang ditulis.
+
+### Pedoman Anti Over-Engineering:
+1. **Solusi Paling Sederhana & Minimal (Smallest Sufficient Solution)**:
+   - Pilih perubahan kode paling ringkas dan jelas yang menyelesaikan tugas secara tuntas (*the smallest clean change that fully solves the task*).
+   - Jangan menulis kode untuk skenario spekulatif masa depan ("future-proofing") yang tidak diminta secara eksplisit dalam PRD atau perintah user. Selesaikan kebutuhan saat ini dengan elegan dan tangguh.
+2. **Larangan Pola Abstraksi Berlebihan (No Unnecessary Abstraction Layers)**:
+   - **Dilarang membuat Generic Repository Pattern** di atas Eloquent ORM. Eloquent sudah merupakan Active Record + Query Builder yang sangat kaya. Cukup gunakan Eloquent Model langsung di dalam Service Layer.
+   - **Dilarang membuat Interface atau Abstract Class** jika hanya ada satu implementasi konkret saat ini (hindari *interface bloat*). Buat interface hanya jika memang ada multi-driver atau polymorphism nyata yang dibutuhkan.
+   - **Dilarang membuat event/bus/queue yang tidak perlu** untuk operasi sinkron yang sederhana dan tidak memerlukan pemrosesan latar belakang (*background job*).
+   - Hindari membuat layer indirection tambahan (misal: *Manager -> Handler -> Processor -> Action -> Service*) yang hanya meneruskan parameter dari satu fungsi ke fungsi lain tanpa logika bernilai tambah.
+3. **Patuhi Batasan Masalah**:
+   - Tulis kode yang mudah dibaca oleh developer manusia lain dalam sekali baca.
+   - Jangan menambahkan kompleksitas arsitektur enterprise pada fungsi CRUD atau alur bisnis yang lurus.
+   - Jika suatu fungsi dapat diselesaikan dalam 5-10 baris kode bersih menggunakan helper Laravel/Vue, jangan buat class atau package baru untuknya.
 
 ===
 

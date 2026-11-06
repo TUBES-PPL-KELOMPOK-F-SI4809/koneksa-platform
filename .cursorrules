@@ -1,0 +1,35 @@
+# Mandatory Pre-Flight Protocol for Koneksa Platform
+
+Before generating plans, creating files, or modifying code in this repository, you MUST follow these non-negotiable rules:
+
+1. **Read Core Documentation in `docs/`**:
+   - `docs/PRD/PRD-KONEKSA-PLATFORM.md` for business logic, 21 feature scopes, and actors.
+   - `docs/analysis/RANCANGAN_ERD_KONEKSA.md` and `docs/analysis/DATABASE-SCHEMA.md` for database schema and entity relations.
+   - `docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md` for proper layered architecture (Controller, Form Request, Service).
+   - `docs/guidelines/CLEAN-CODE.md` for zero-regression and anti-regression principles.
+   - `docs/design-system/BASELINE-DESIGN.md` and `docs/design-system/DESIGN-TOKENS.md` for visual hierarchy and styling.
+
+2. **Activate Relevant Skills in `.agents/skills/` and `.antigravity/skills/`**:
+   - Laravel Backend: `.antigravity/skills/laravel-best-practices/`
+   - Inertia & Vue: `.antigravity/skills/inertia-vue-development/`
+   - Tailwind CSS: `.antigravity/skills/tailwindcss-development/`
+   - Accessible UI: `.agents/skills/shadcn-ui/` (Shadcn-First mandate)
+   - UI/UX Intelligence: `.agents/skills/ui-ux-pro-max/` & `.agents/skills/taste-design/`
+   - Test Design: `.antigravity/skills/testing-best-practices/`
+
+3. **Anti Over-Engineering (KISS & YAGNI Mandate)**:
+   - Always choose the smallest, simplest, and cleanest solution that solves the problem.
+   - Do NOT build speculative future-proofing or complex multi-tier wrappers (no generic repository layers over Eloquent, no single-implementation interfaces, no unnecessary micro-abstraction).
+
+4. **Check Installed Dependencies First**:
+   - Always check `composer.json` and `package.json` before writing custom helpers, utility methods, or installing new packages.
+   - Leverage built-in Laravel utilities (`Str`, `Arr`, `Carbon`, `Collection`) and Vue/Inertia helpers (`useForm`).
+
+5. **Mandatory Unit & Feature Testing**:
+   - Never mark a feature complete without writing/updating tests.
+   - Run `php artisan test` and verify 100% PASS (green).
+
+6. **Code Quality**:
+   - Format PHP files with `vendor/bin/pint --dirty --format agent`.
+   - Never modify historical database migrations; always create new migration files for schema adjustments.
+

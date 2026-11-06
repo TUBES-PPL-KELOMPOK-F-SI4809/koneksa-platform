@@ -136,16 +136,19 @@ Jika fitur baru membutuhkan pemicu dari aktivitas fitur yang sudah ada (contoh: 
 
 ---
 
-## 4. Prinsip Ecosystem-First: Dilarang Membuat Ulang Roda (*No Reinventing The Wheel*)
+## 4. Prinsip Ecosystem-First: Cek Dependensi Terpasang & Larangan Membuat Ulang Roda (*No Reinventing The Wheel*)
 
-Sebelum menulis fungsi utilitas kustom, cek apakah framework dan ekosistem sudah menyediakannya:
+Sebelum menulis fungsi utilitas kustom, helper baru, atau algoritma manual, **Agent WAJIB memeriksa daftar dependensi yang sudah ada di `composer.json` dan `package.json`**:
 
-1. **Gunakan Fitur Bawaan Laravel**:
+1. **Audit Dependensi yang Sudah Ada**:
+   - Periksa `composer.json` (atau `composer show --direct`) untuk paket PHP yang telah terpasang.
+   - Periksa `package.json` untuk paket JavaScript/Vue yang telah terpasang.
+2. **Gunakan Fitur Bawaan Laravel**:
    - Manipulasi koleksi: `collect($items)->pluck('id')`, `where()`, `unique()`.
    - String & Array: `Str::slug()`, `Str::headline()`, `Arr::get()`, `Arr::only()`.
    - Tanggal & Waktu: `Carbon::parse()`, `now()->addDays(7)`.
    - Autentikasi: `Auth::id()`, `$request->user()->can('update', $initiative)`.
-2. **Gunakan Fitur Bawaan Vue / Inertia**:
+3. **Gunakan Fitur Bawaan Vue / Inertia**:
    - Penanganan form: `useForm` dari `@inertiajs/vue3` (sudah menyediakan state data, error handling, reset, submit helper, dan tracking loading).
    - Navigasi: Komponen `<Link :href="route('...')">`.
    - Komponen UI: Primitif dari `shadcn-ui`.
@@ -160,10 +163,28 @@ Sebelum menulis fungsi utilitas kustom, cek apakah framework dan ekosistem sudah
 
 ---
 
-## 6. Checklist Pencegahan Error Sebelum Menyerahkan Fitur
+## 6. Prinsip Anti Over-Engineering: Sederhana & Praktis (KISS & YAGNI)
+
+Setiap kode yang dibuat harus mematuhi prinsip **KISS (Keep It Simple, Stupid)** dan **YAGNI (You Aren't Gonna Need It)**:
+
+1. **Solusi Paling Ringkas & Cukup (*Smallest Clean Solution*)**:
+   - Implementasikan solusi paling sederhana dan langsung yang memenuhi spesifikasi fitur.
+   - Dilarang membuat kode untuk skenario spekulatif masa depan ("future-proofing") yang tidak diminta dalam PRD.
+2. **Hindari Abstraksi Berlapis Tanpa Nilai Tambah**:
+   - **Dilarang membungkus Eloquent dengan Repository Pattern generik**. Model Eloquent yang dipanggil di Service layer sudah cukup bersih dan ekspresif.
+   - **Dilarang membuat Interface tambahan** jika implementasinya hanya ada 1 class dan tidak ada kebutuhan polymorphism dalam waktu dekat.
+   - **Dilarang menambahkan layer indirection** (seperti action -> processor -> pipeline -> service) untuk logika bisnis sederhana.
+3. **Keterbacaan Utama**:
+   - Kode harus mudah dibaca dan dipahami oleh developer lain dalam sekali baca.
+   - Prioritaskan kejelasan alur logika daripada teknik metaprogramming atau pola desain rumit yang tidak diperlukan.
+
+---
+
+## 7. Checklist Pencegahan Error Sebelum Menyerahkan Fitur
 
 Sebelum menandai penambahan fitur selesai, periksa:
-- [ ] Apakah ada fungsi utilitas yang dibuat manual padahal sudah disediakan Laravel/Vue?
+- [ ] Apakah ada fungsi utilitas yang dibuat manual padahal sudah disediakan pustaka di `composer.json` atau `package.json`?
+- [ ] Apakah solusi yang dibuat bebas dari over-engineering (tidak ada interface/repository/layer berlebihan yang tidak perlu)?
 - [ ] Apakah seluruh berkas dibuat menggunakan generator CLI resmi (`php artisan make:*`)?
 - [ ] Apakah ada file fitur lain yang dimodifikasi tanpa alasan jelas? (Periksa `git status` dan `git diff`).
 - [ ] Apakah semua dependensi fitur baru telah terisolasi dalam Form Request dan Service layer miliknya sendiri?
