@@ -1,61 +1,47 @@
-# 🌿 Standar Git Workflow & Kolaborasi Tim — Koneksa Platform
+# Git workflow dan serah terima
 
-Dokumen ini memuat panduan percabangan (*branching strategy*), konvensi commit, dan alur peninjauan kode (*code review*) bagi tim pengembang Koneksa Platform.
+Ikuti [AGENTS.md](../../AGENTS.md), terutama batas otorisasi dan verifikasi.
 
----
+## Branch dan commit
 
-## 1. Strategi Percabangan (Branching Strategy)
+- main: rilis stabil; dev: integrasi tim.
+- Pertahankan branch tugas yang sudah ditentukan pengguna.
+- Untuk branch baru yang dibuat agent, default codex/<deskripsi> kecuali pengguna
+  menentukan nama lain. Tim manusia dapat memakai feat/, fix/ atau docs/.
+- Periksa status/diff sebelum mulai dan sebelum commit. Jangan menimpa perubahan
+  pengguna atau menyertakannya tanpa hubungan/otorisasi.
+- Conventional Commits: feat, fix, docs, style, refactor, test, chore;
+  contoh docs(agents): align the canonical agent workflow.
+- Jangan commit/push/merge tanpa permintaan/otorisasi yang mencakupnya.
+  Permintaan push mengizinkan commit perubahan terkait dan push normal branch tugas,
+  bukan force-push, merge, atau deploy.
 
-Kami menggunakan model adaptasi **GitHub Flow** yang terstruktur:
+## Sebelum publikasi
 
-* `main`: Branch produksi stabil. Kode di branch ini selalu siap deploy ke production.
-* `dev`: Branch integrasi utama seluruh tim untuk pengembangan fitur harian dan persiapan sprint release.
-* `feat/<kode-fitur>-<deskripsi-singkat>`: Branch kerja untuk fitur baru (contoh: `feat/KSA-10-registrasi-multi-role`).
-* `fix/<deskripsi-bug>`: Branch perbaikan cacat/bug (contoh: `fix/login-csrf-token`).
-* `docs/<nama-dokumen>`: Khusus pembaruan dokumentasi (contoh: `docs/update-prd`).
+1. Review diff dan git diff --check.
+2. Jalankan pemeriksaan sesuai matriks AGENTS.md. Perilaku backend/skema memerlukan
+   seluruh php artisan test; perubahan frontend memerlukan build/browser sesuai dampak.
+   Dokumentasi saja cukup pemeriksaan tautan/path/perintah dan konsistensi.
+3. PHP berubah: jalankan vendor/bin/pint --dirty --format agent.
+4. Perbarui kontrak/dokumen yang terdampak; jangan membuat dokumen status terpisah tanpa kebutuhan.
+5. Periksa remote dan divergence. Jika push ditolak karena perubahan baru, fetch dan
+   integrasikan dengan menjaga pekerjaan pengguna; jangan force-push.
+6. Jika PR dibuat, tulis masalah/perilaku akhir, FR terkait, validasi aktual,
+   dan keterbatasan. Jika platform menyediakan tool attachment PR, lampirkan PR tersebut.
 
----
+## CI
 
-## 2. Standar Pesan Commit (Conventional Commits)
+.github/workflows/ci.yml berjalan pada push/PR ke main dan dev:
+Pint --test, npm ci + build, dan backend tests dengan environment MySQL.
+CI saat ini menjalankan semua job termasuk untuk dokumentasi; verifikasi lokal
+berbasis dampak tidak mengubah konfigurasi tersebut.
 
-Format penulisan commit wajib menggunakan format:
-`<tipe>(<lingkup>): <deskripsi ringkas dalam kalimat aktif>`
+Status CI harus diperiksa sebelum mengklaim CI lulus. Push sukses bukan bukti CI hijau.
+Sebelum merge, seluruh checks wajib lulus; branch protection aktual perlu diperiksa
+di GitHub dan tidak dibuktikan oleh dokumen ini.
 
-### Tipe Commit yang Diizinkan:
-* `feat`: Penambahan fitur baru bagi pengguna.
-* `fix`: Perbaikan bug atau galat program.
-* `docs`: Pembaruan atau penambahan berkas dokumentasi.
-* `style`: Penyesuaian tampilan, formatting, titik koma (tidak mengubah logika kode).
-* `refactor`: Restrukturisasi kode tanpa mengubah fungsionalitas eksternal.
-* `test`: Penambahan atau perbaikan berkas unit/feature test.
-* `chore`: Pembaruan dependensi, konfigurasi build, atau skrip internal.
+## Handoff
 
-### Contoh:
-```bash
-git commit -m "feat(auth): tambahkan validasi format email pada pendaftaran"
-git commit -m "test(auth): tambahkan unit test untuk skenario password lemah"
-git commit -m "docs(design): tambahkan spesifikasi token elevasi dan warna"
-```
-
----
-
-## 3. Checklist Sebelum Membuat Pull Request (PR)
-
-- [ ] Seluruh unit test lokal lulus (`php artisan test --testsuite=Unit`).
-- [ ] Kode lolos verifikasi standar format Laravel Pint (`vendor/bin/pint --test`).
-- [ ] Aset frontend berhasil di-build tanpa galat (`npm run build`).
-- [ ] Kode bersih dari `dd()`, `dump()`, atau `console.log()` sementara.
-- [ ] Dokumentasi terkait (PRD / ERD / Tech Stack) telah diperbarui jika ada perubahan skema atau dependensi.
-- [ ] Tidak ada konflik (*merge conflict*) dengan branch target (`dev`/`main`).
-
----
-
-## 4. Otomatisasi CI / Code Quality Gate (GitHub Actions)
-
-Setiap Pull Request dan Push yang menargetkan branch `dev` maupun `main` akan secara otomatis memicu alur kerja pengujian di GitHub Actions (`.github/workflows/ci.yml`):
-1. **Code Style (Laravel Pint)**: Memverifikasi kode PHP mematuhi standar PSR-12 / Laravel Code Style (`vendor/bin/pint --test`).
-2. **Frontend Build (Vite & Vue)**: Menguji integritas kompilasi dan bundling frontend (`npm ci` & `npm run build`).
-3. **Backend Tests (PHPUnit & MySQL)**: Menjalankan seluruh Unit Test dan Feature Test menggunakan service container database MySQL terisolasi.
-
-> **Catatan**: Status seluruh pengecekan di atas **WAJIB GREEN (PASS)** sebelum sebuah Pull Request diizinkan untuk di-merge ke branch `dev` maupun `main`.
-
+Laporkan branch/commit/tautan, perubahan, perintah yang benar-benar dijalankan,
+hasil dan pemeriksaan terblokir. Jika belum selesai, sertakan sisa pekerjaan,
+keputusan terbuka dan lokasi kode/test agar agent berikut dapat melanjutkan.

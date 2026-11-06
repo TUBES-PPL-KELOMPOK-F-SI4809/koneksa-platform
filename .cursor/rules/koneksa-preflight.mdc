@@ -1,0 +1,9 @@
+---
+description: Read the canonical Koneksa agent workflow and relevant domain rules
+globs: "**/*"
+alwaysApply: true
+---
+
+Read AGENTS.md at the repository root, then .ai/rules/index.md and the rules
+relevant to the task. Follow its context-loading, skill, verification and handoff workflow.
+This file is an adapter, not a separate source of project policy.

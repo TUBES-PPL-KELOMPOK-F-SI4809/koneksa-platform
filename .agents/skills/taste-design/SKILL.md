@@ -9,6 +9,15 @@ allowed-tools:
 
 # Stitch Design Taste — Semantic Design System Skill
 
+## Koneksa scope
+
+Use only for an explicitly relevant Stitch/design-system task, not routine Vue work.
+AGENTS.md and docs/design-system/BASELINE-DESIGN.md / DESIGN-TOKENS.md take precedence
+over aesthetic defaults below (accent count, font bans, radii, motion, layout).
+Preserve project branding and reduced-motion behavior. Generate DESIGN.md only when
+the authorized task needs that artifact; do not introduce an extra source of project policy.
+
+
 ## Overview
 This skill generates `DESIGN.md` files optimized for Google Stitch screen generation. It translates the battle-tested anti-slop frontend engineering directives into Stitch's native semantic design language — descriptive, natural-language rules paired with precise values that Stitch's AI agent can interpret to produce premium, non-generic interfaces.
 

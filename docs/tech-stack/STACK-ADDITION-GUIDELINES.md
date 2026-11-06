@@ -1,90 +1,33 @@
-# 📋 Panduan Penambahan Tech Stack & Dependensi Baru
+# Perubahan dependensi dan stack
 
-Dokumen ini mengatur tata cara, kriteria evaluasi, dan protokol dokumentasi apabila tim pengembang atau AI Coding Agent hendak menambahkan pustaka (*library*), paket (*package*), atau teknologi baru (*stack*) ke dalam repositori **Koneksa Platform**.
+Ikuti [AGENTS.md](../../AGENTS.md). Instalasi/penghapusan/penggantian dependensi
+memerlukan otorisasi pengguna yang mencakup perubahan tersebut.
+Tidak perlu meminta ulang bila sudah diotorisasi secara eksplisit.
 
----
+## Evaluasi sebelum instalasi
 
-## 1. Prinsip Penambahan Stack
+1. Periksa kode/helper, dependensi terpasang dan kemampuan native framework.
+2. Jelaskan kebutuhan nyata, alternatif, kompatibilitas Laravel/Vue/PHP/Node,
+   lisensi, pemeliharaan, keamanan dan dampak bundle yang relevan.
+3. Catat keputusan pada tugas/PR. Perubahan stack signifikan memakai RFC ringkas
+   pada tugas/PR atau dokumen tech-stack yang diminta; jangan membuat dokumen tambahan
+   untuk setiap utilitas kecil.
+4. Jika belum diotorisasi, siapkan usulan konkret lalu minta persetujuan sebelum
+   menjalankan installer. CLI komponen UI dapat mengubah package.json dan termasuk aturan ini.
+5. Setelah disetujui: gunakan Composer/npm CLI, periksa manifest dan lockfile,
+   jalankan audit yang relevan dan pengujian integrasi yang bermakna.
+6. Perbarui [CURRENT-STACK.md](CURRENT-STACK.md) untuk integrasi yang berubah.
+   Bedakan terpasang, aktif, dan belum terintegrasi.
 
-Setiap penambahan dependensi membawa biaya jangka panjang (*maintenance cost*, potensi kerentanan keamanan, ukuran *bundle*, dan waktu kompilasi). Oleh karena itu, prinsip berikut wajib dipenuhi:
+## Catatan keputusan
 
-1. **Prinsip Kebutuhan Nyata (Real Necessity)**:
-   - Apakah masalah dapat diselesaikan dengan pustaka bawaan framework (Laravel / Vue / Tailwind / styled-components)?
-   - Jika ya, **utamakan implementasi bawaan** tanpa menambah package pihak ketiga.
-2. **Kesehatan & Reputasi Dependensi**:
-   - Pustaka harus aktif dirawat (update terakhir < 6 bulan).
-   - Memiliki lisensi ramah open-source (MIT, Apache 2.0, BSD).
-   - Memiliki riwayat keamanan yang baik (`npm audit` atau `composer audit` bebas dari kerentanan kritis).
-3. **Dampak Performa & Ukuran Bundle**:
-   - Untuk paket frontend (npm): periksa ukuran di `bundlephobia.com`. Hindari pustaka berbobot besar (> 50KB gzip) untuk fungsi sepele.
-   - Untuk paket backend (composer): pastikan kompatibel dengan versi PHP 8.5 dan Laravel 13.
+Gunakan format secukupnya pada tugas/PR:
+- Kebutuhan dan FR terkait.
+- Paket/versi target serta alternatif yang sudah dievaluasi.
+- Dampak runtime, lisensi, keamanan, bundle dan alasan pilihan.
+- Otorisasi yang sudah diberikan atau keputusan yang masih diperlukan.
+- Pengujian dan hasil aktual; laporkan audit yang tidak dapat dijalankan.
 
----
-
-## 2. Alur Pengajuan Stack Baru (RFC Workflow)
-
-```text
-1. Identifikasi Kebutuhan ──► 2. Evaluasi Alternatif ──► 3. Buat Catatan RFC
-                                                               │
-                                                               ▼
-6. Update Dokumentasi    ◄── 5. Jalankan Unit Test  ◄── 4. Instalasi Paket
-   (CURRENT-STACK.md)
-```
-
-### Langkah-langkah:
-1. **Buat Usulan (RFC)**: Isi template pengajuan pada Bagian 4 dokumen ini.
-2. **Instalasi Formal**:
-   - Backend: `composer require vendor/package-name` (atau `--dev` jika hanya untuk testing/dev).
-   - Frontend: `npm install package-name` (atau `--save-dev`).
-3. **Audit Keamanan**:
-   - Jalankan `composer audit` atau `npm audit`.
-4. **Verifikasi Unit Test**:
-   - Tulis unit test untuk memvalidasi fungsi yang memanfaatkan pustaka baru tersebut.
-5. **Pembaruan Berkas Dokumentasi**:
-   - Catat paket baru di tabel riwayat di bawah ini.
-   - Perbarui berkas [CURRENT-STACK.md](CURRENT-STACK.md).
-
----
-
-## 3. Log Riwayat Penambahan Stack (Tech Stack Log)
-
-Setiap penambahan paket wajib dicatat dalam tabel ini:
-
-| Tanggal | Nama Paket / Stack | Versi | Kategori | Alasan & Penggunaan | Pengusul | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| *Inisial* | `laravel/framework` | `13.x` | Backend Core | Framework utama aplikasi web | Tim PPL | Disetujui |
-| *Inisial* | `@inertiajs/vue3` | `^2.0.0` | Frontend Adapter | Jembatan monolith SPA modern | Tim PPL | Disetujui |
-| *Inisial* | `tailwindcss` | `^3.x / ^4.x`| Styling | Utility layouting & atomic styling | Tim PPL | Disetujui |
-| *Inisial* | `styled-components` | `^6.6.0` | Styling | CSS-in-JS untuk komponen dinamis ber-props | User | Disetujui |
-| *Inisial* | `.agents/skills/*` | `v1.0` | Agent Tooling | Skill sistem desain & pengujian otomatis | Tim PPL | Disetujui |
-
----
-
-## 4. Template Formulir Pengajuan (RFC Template)
-
-Salin template di bawah ini saat mendokumentasikan penambahan dependensi baru:
-
-```markdown
-### RFC-XXX: [Nama Pustaka / Stack yang Diajukan]
-
-- **Nama Paket**: `vendor/package` atau `package-name`
-- **Tipe Dependensi**: `dependencies` / `devDependencies` / `composer require`
-- **Versi**: `x.y.z`
-- **Lisensi**: MIT / Apache-2.0 / BSD
-
-#### 1. Masalah yang Diselesaikan:
-[Jelaskan kebutuhan fungsional yang memerlukan pustaka ini]
-
-#### 2. Alternatif yang Telah Dipertimbangkan:
-- Alternatif A: [Alasan mengapa ditolak]
-- Alternatif B: [Alasan mengapa ditolak]
-
-#### 3. Dampak Keamanan & Performa:
-- Hasil audit (`npm audit` / `composer audit`): Clean / 0 vulnerabilities
-- Ukuran bundle (jika frontend): ~XX KB gzipped
-- Kompatibilitas versi PHP / Node: Kompatibel dengan PHP 8.5+ & Node 20+
-
-#### 4. Dampak Pengujian (Testing Strategy):
-[Rencana unit test untuk menguji integrasi modul ini]
-```
-
+Target runtime dan versi aktif mengikuti manifests/lockfiles serta CI, bukan angka
+pada template. Jangan memakai @latest tanpa memeriksa kompatibilitas konfigurasi.
+Jangan menganggap paket React cocok dengan Vue karena sama-sama memakai Tailwind.

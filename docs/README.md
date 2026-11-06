@@ -1,64 +1,40 @@
-# 📚 Koneksa Platform — Dokumentasi Proyek
+# Dokumentasi Koneksa Platform
 
-Selamat datang di pusat dokumentasi resmi **Koneksa Platform** (Proyek Tugas Besar Pengembangan Perangkat Lunak / Tubes PPL). Direktori `docs/` ini adalah sumber kebenaran tunggal (*single source of truth*) untuk seluruh aspek teknis, manajerial, analisis, desain antarmuka, dan arsitektur perangkat lunak.
+Mulai dari [AGENTS.md](../AGENTS.md) untuk workflow lintas agent.
+Dokumen di sini menjelaskan kontrak domain; aturan operasional tidak disalin per editor.
 
----
+| Kebutuhan | Acuan |
+|---|---|
+| Lingkup 21 fitur / 42 FR | [PRD](PRD/PRD-KONEKSA-PLATFORM.md) |
+| Spesifikasi fitur baru | [Template PRD](PRD/PRD-TEMPLATE.md) |
+| Rancangan data dan invariant kanonis | [ERD](analysis/RANCANGAN_ERD_KONEKSA.md) |
+| Pengarah skema dan pemeriksaan implementasi | [Skema](analysis/DATABASE-SCHEMA.md) |
+| Analisis/use case | [Analisis sistem](analysis/SYSTEM-ANALYST-GUIDELINES.md) |
+| Batas Inertia dan REST | [API](analysis/API-SPECIFICATION-GUIDE.md) |
+| UI dan token | [Baseline](design-system/BASELINE-DESIGN.md), [Tokens](design-system/DESIGN-TOKENS.md) |
+| Status styling Vue / styled-components | [Styling](design-system/STYLED-COMPONENTS.md) |
+| Struktur fitur | [Pengembangan](guidelines/FEATURE-DEVELOPMENT-GUIDE.md), [Clean Code](guidelines/CLEAN-CODE.md) |
+| Verifikasi | [Testing](guidelines/AGENT-UNIT-TESTING.md) |
+| Commit, push dan PR | [Git workflow](guidelines/GIT-WORKFLOW.md) |
+| Stack aktif dan keterbatasan | [Stack](tech-stack/CURRENT-STACK.md) |
+| Dependensi baru | [Prosedur stack](tech-stack/STACK-ADDITION-GUIDELINES.md) |
 
-## 🗂 Struktur Direktori Dokumentasi
+Baca bagian yang terkait tugas. PRD/ERD menyatakan kebutuhan/rancangan, bukan bukti
+bahwa seluruh fitur sudah selesai. Telusuri kode, migrasi dan test sebelum menyatakan status.
+Perbarui sumber yang berubah, bukan menambahkan versi kontrak paralel.
 
-```text
-docs/
-├── README.md                          # Indeks & panduan utama dokumentasi
-│
-├── design-system/                     # Baseline Desain Website & Styling
-│   ├── BASELINE-DESIGN.md             # Baseline desain website, filosofi, & panduan skill
-│   ├── STYLED-COMPONENTS.md           # Panduan integrasi styled-components & pola pemakaian
-│   └── DESIGN-TOKENS.md               # Spesifikasi token desain (warna, tipografi, spacing, dsb.)
-│
-├── tech-stack/                        # Dokumentasi & Tata Kelola Stack Teknologi
-│   ├── CURRENT-STACK.md               # Daftar lengkap stack yang sedang aktif digunakan
-│   └── STACK-ADDITION-GUIDELINES.md   # Prosedur (RFC) jika ada penambahan stack/library baru
-│
-├── PRD/                               # Product Requirement Documents
-│   ├── PRD-TEMPLATE.md                # Template standar PRD untuk setiap fitur baru
-│   └── PRD-KONEKSA-PLATFORM.md        # PRD tingkat tinggi platform Koneksa (Inisial Baseline)
-│
-├── analysis/                          # Analisis Sistem & Rekayasa Perangkat Lunak
-│   ├── SYSTEM-ANALYST-GUIDELINES.md   # Standar UML, Use Case, Sequence, & Activity Diagram
-│   ├── DATABASE-SCHEMA.md             # Dokumentasi baseline skema basis data & konvensi ERD
-│   └── API-SPECIFICATION-GUIDE.md     # Standar perancangan API (RESTful, payload, HTTP status)
-│
-└── guidelines/                        # Aturan Operasional & Panduan Pengembang
-    ├── CLEAN-CODE.md                  # Panduan Clean Code & arsitektur anti-regresi
-    ├── FEATURE-DEVELOPMENT-GUIDE.md   # SOP pembuatan file/folder fitur, package, & DB schema
-    ├── AGENT-UNIT-TESTING.md          # Aturan & alur wajib unit testing bagi AI Agent & Dev
-    └── GIT-WORKFLOW.md                # Standar percabangan (branching) & pesan commit Git
-```
+## Memulai pada editor/agent berbeda
 
----
+| Agent/editor | Entrypoint repo |
+|---|---|
+| Codex dan agent yang membaca AGENTS.md | AGENTS.md |
+| Claude Code | CLAUDE.md → AGENTS.md |
+| Gemini / integrasi yang membaca GEMINI.md | GEMINI.md → AGENTS.md |
+| Antigravity / integrasi rules lokal | .agents/rules/mandatory-reading.md → AGENTS.md |
+| Cursor | .cursor/rules/koneksa-preflight.mdc; .cursorrules sebagai adaptor kompatibilitas |
+| Windsurf | .windsurfrules → AGENTS.md |
+| Copilot | .github/copilot-instructions.md → AGENTS.md |
 
-## 🚀 Prinsip Utama Pengembangan
-
-1. **Clean Code & Isolasi Fitur (Anti-Regresi)**:
-   - Dilarang menumpuk kode fitur baru ke dalam berkas fitur lain. Gunakan **Thin Controller**, **Dedicated Form Request**, dan **Service Layer** agar penambahan fitur tidak memicu bug pada fitur lain.
-   - Baca [CLEAN-CODE.md](guidelines/CLEAN-CODE.md) dan [FEATURE-DEVELOPMENT-GUIDE.md](guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
-
-2. **Test-Driven & Verifikasi Mandiri**:
-   - Setiap fitur yang selesai dikerjakan **WAJIB** disertai unit test yang lulus (green). AI Agent dan developer dilarang menutup tugas sebelum test lulus.
-   - Baca [AGENT-UNIT-TESTING.md](guidelines/AGENT-UNIT-TESTING.md).
-
-3. **Konsistensi Desain Antarmuka & Prinsip Shadcn-First**:
-   - Pembangunan tampilan antarmuka wajib mengacu pada [BASELINE-DESIGN.md](design-system/BASELINE-DESIGN.md).
-   - **Wajib Shadcn-First**: Selalu cek ketersediaan komponen di `shadcn-ui` sebelum membuat komponen sendiri dari nol. Padukan dengan `styled-components` dan Tailwind CSS sesuai token desain.
-
-4. **Ecosystem-First & CLI-First**:
-   - Manfaatkan fungsi, helper, dan komponen yang sudah ada di ekosistem Laravel (`Str`, `Arr`, `Carbon`, `Collection`) dan frontend (`useForm`, `shadcn-ui`) sebelum membuat sendiri.
-   - Wajib memaksimalkan CLI bawaan (`php artisan make:*`, `npm`, `npx`) untuk scaffolding dan pengujian.
-
-5. **Tertib Penambahan Stack & Skema Database**:
-   - Dilarang mengedit migrasi lama. Penambahan kolom wajib *nullable* atau memiliki *default*.
-   - Dilarang menambahkan dependensi/package sembarangan tanpa evaluasi RFC pada [STACK-ADDITION-GUIDELINES.md](tech-stack/STACK-ADDITION-GUIDELINES.md).
-
-6. **Keterlacakan Analisis (Traceability)**:
-   - Setiap kode yang dibangun harus dapat dirunut balik ke Use Case di [analysis/](analysis/) dan kebutuhan pengguna di [PRD/](PRD/).
-
+Nama berkas tidak menjamin semua versi editor memuatnya otomatis. Pada integrasi baru,
+pastikan konteks sesi memuat AGENTS.md dari root repo; bila tidak, arahkan agent untuk
+membacanya secara eksplisit. Jangan menyalin seluruh dokumen ke konfigurasi editor.

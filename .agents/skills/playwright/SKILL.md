@@ -7,7 +7,7 @@ description: "Use when the task requires automating a real browser from the term
 # Playwright CLI Skill
 
 Drive a real browser from the terminal using `playwright-cli`. Prefer the bundled wrapper script so the CLI works even when it is not globally installed.
-Treat this skill as CLI-first automation. Do not pivot to `@playwright/test` unless the user explicitly asks for test files.
+Treat this skill as CLI-first browser verification. Persistent E2E test files require a configured runner and authorization for any dependency additions. Follow AGENTS.md for verification requirements.
 
 ## Prerequisite check (required)
 
@@ -17,28 +17,17 @@ Before proposing commands, check whether `npx` is available (the wrapper depends
 command -v npx >/dev/null 2>&1
 ```
 
-If it is not available, pause and ask the user to install Node.js/npm (which provides `npx`). Provide these steps verbatim:
-
-```bash
-# Verify Node/npm are installed
-node --version
-npm --version
-
-# If missing, install Node.js/npm, then:
-npm install -g @playwright/cli@latest
-playwright-cli --help
-```
-
-Once `npx` is present, proceed with the wrapper script. A global install of `playwright-cli` is optional.
+If npx is unavailable, report the prerequisite and continue independent work.
+Do not install global packages automatically. A global Playwright CLI install is optional;
+the local wrapper uses npx and may require network access and an available browser.
 
 ## Skill path (set once)
 
 ```bash
-export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"
+export PWCLI="$PWD/.agents/skills/playwright/scripts/playwright_cli.sh"
 ```
 
-User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).
+Run from the repository root. This repository bundles the wrapper locally; do not assume a user-global skill installation. Use `bash "$PWCLI"` if the executable bit is unavailable.
 
 ## Quick start
 
