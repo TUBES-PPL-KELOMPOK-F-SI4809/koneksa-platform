@@ -1,86 +1,65 @@
-# 🧪 Panduan & Aturan Unit Testing untuk AI Agent & Pengembang
+# Pengujian dan bukti penyelesaian
 
-Dokumen ini menjelaskan tata cara, standar penulisan, dan aturan kepatuhan pelaksanaan **Unit Testing** pada proyek **Koneksa Platform**. Aturan ini mengikat bagi seluruh AI Coding Agent dan pengembang tim.
+Kewajiban verifikasi ditetapkan di [AGENTS.md](../../AGENTS.md) bagian 4.
+Panduan ini berlaku untuk PHPUnit proyek; Pest belum menjadi runner terpasang.
 
----
+## Pilih cakupan berdasarkan perilaku
 
-## 1. Aturan Mutlak: Pengujian Pasca Fitur (Mandatory Post-Feature Testing)
+- Feature test: route, autentikasi, otorisasi, kepemilikan data, validasi dan persistensi.
+- Unit test: fungsi/perhitungan murni tanpa bootstrap Laravel/DB.
+- Tambah/perbarui regression test untuk keputusan bisnis yang berubah, happy path dan
+  failure mode bernilai tinggi: input invalid, akses pihak lain, stok/kuota boundary,
+  rollback atau submit berulang bila terkait.
+- Jangan membuat test yang menyalin logika ke badan test. Assertion harus memanggil
+  kode aplikasi dan memeriksa hasil yang dapat diamati.
+- Gunakan Arrange–Act–Assert, factory dan fake sesuai konvensi test sekitar.
+  Komentar AAA tidak wajib ketika alurnya sudah jelas.
+- Jangan menguji ulang framework atau menambah assertion hanya untuk menaikkan jumlah test.
 
-> **ATURAN UTAMA**:
-> Setiap kali pengembang atau AI Agent menyelesaikan penulisan kode untuk satu fitur (baik fungsionalitas backend, endpoint API, service, validasi, maupun komponen antarmuka), **WAJIB membuat/memperbarui unit test dan menjalankannya hingga seluruh pengujian berstatus PASS (green) sebelum fitur diserahkan ke pengguna.**
+## Backend
 
-### Definisi Selesai (Definition of Done - DoD):
-Pekerjaan suatu fitur **DILARANG** dinyatakan selesai kecuali memenuhi seluruh checklist berikut:
-- [ ] Kode implementasi fitur selesai dan bersih dari debug/console log.
-- [ ] Berkas unit test ditulis di `tests/Unit/` (atau test runner frontend) mencakup *Happy Path* dan *Edge Cases*.
-- [ ] Test dijalankan di terminal dan menghasilkan **Status: PASSED (exit code 0)**.
-- [ ] Tidak ada regresi (seluruh test sebelumnya tetap lulus).
-- [ ] Bukti output tes dilampirkan dalam ringkasan kepada pengguna.
+~~~bash
+# Saat iterasi: file yang terdampak
+php artisan test --compact tests/Feature/ProfileTest.php
 
----
+# Pemeriksaan akhir perubahan perilaku backend/skema: Unit dan Feature
+php artisan test
 
-## 2. Pola Penulisan Unit Test (AAA Pattern)
+# Format hanya ketika PHP diubah
+vendor/bin/pint --dirty --format agent
+~~~
 
-Setiap unit test wajib ditulis mengikuti struktur **Arrange - Act - Assert**:
+Jalankan affected tests sebelum perubahan untuk mengetahui baseline, lalu sesudahnya.
+phpunit.xml memakai SQLite :memory: lokal. CI backend memakai environment MySQL.
+Gunakan database test terisolasi; jangan migrate:fresh pada database development/produksi.
+Untuk perilaku locking, race condition atau constraint khusus MySQL, verifikasi tambahan
+pada MySQL test terisolasi diperlukan; SQLite saja tidak membuktikan perilaku tersebut.
+Suite Unit saat ini hanya memiliki contoh dasar, sehingga Unit saja tidak memadai.
 
-```php
-<?php
+## Frontend dan browser
 
-namespace Tests\Unit;
+package.json menyediakan build/dev, belum test runner komponen.
+Jangan menjalankan npm test atau npx vitest sebagai langkah standar yang dianggap tersedia.
+Perubahan perilaku Vue memerlukan test server terkait, build dan pemeriksaan browser;
+component test ditambahkan bila runner tersedia/penambahannya diotorisasi.
 
-use PHPUnit\Framework\TestCase;
+~~~bash
+npm run build
+command -v npx
+bash .agents/skills/playwright/scripts/playwright_cli.sh --help
+~~~
 
-class InitiativeValidationTest extends TestCase
-{
-    /**
-     * Memastikan kuota inisiatif minimal bernilai 1.
-     */
-    public function test_initiative_quota_must_be_positive_integer(): void
-    {
-        // 1. Arrange (Persiapan data & input)
-        $invalidQuota = 0;
+Wrapper Playwright memanggil npx dan mungkin mengambil paket. Periksa ketersediaan
+network/browser; gunakan skill untuk snapshot, interaksi dan assertion hasil alur.
+Uji input/error/loading, keyboard/focus dan viewport yang relevan.
+Build sukses hanya membuktikan kompilasi, bukan interaksi UI.
 
-        // 2. Act (Eksekusi logika yang diuji)
-        $isValid = $invalidQuota >= 1;
+## Dokumentasi, layout dan kegagalan
 
-        // 3. Assert (Verifikasi hasil)
-        $this->assertFalse($isValid, 'Quota di bawah 1 seharusnya tidak valid.');
-    }
-}
-```
+Dokumentasi/instruksi saja: review diff, cek tautan lokal/path/perintah dan konsistensi.
+Layout/copy saja: build dan inspeksi browser; tidak memerlukan test logika baru.
 
----
-
-## 3. Menjalankan Unit Test di Lingkungan Koneksa
-
-### 3.1 Menjalankan Unit Test Backend (PHPUnit / Pest)
-```bash
-# Menjalankan seluruh test suite Unit
-php artisan test --testsuite=Unit
-
-# Menjalankan file test spesifik
-php artisan test tests/Unit/ExampleTest.php
-
-# Menjalankan test dengan filter method
-php artisan test --filter=test_initiative_quota_must_be_positive_integer
-```
-
-### 3.2 Menjalankan Pengujian Frontend / Browser
-```bash
-# Eksekusi runner unit/komponen JS
-npm run test # jika runner vitest/jest terkonfigurasi
-
-# Eksekusi browser testing otomatis via Playwright
-node .agents/skills/playwright/scripts/playwright-cli.js --help
-```
-
----
-
-## 4. Penanganan Kesalahan Uji (Troubleshooting Failures)
-
-Jika saat menjalankan tes terjadi kegagalan (Failing / Error):
-1. **Analisis Stack Trace**: Perhatikan file, baris kode, dan pesan error yang diberikan test runner.
-2. **Koreksi Kode**: Perbaiki implementasi atau sesuaikan ekspektasi test jika terdapat perubahan spesifikasi yang valid.
-3. **Re-run Test**: Jalankan ulang test hingga seluruh assertion berwarna hijau (*green*).
-4. **Jangan Pernah Mengabaikan Tes Gagal**: Dilarang menghapus atau me-skip tes (`->markTestSkipped()` tanpa alasan teknis resmi) hanya demi meloloskan eksekusi.
-
+Periksa exit code, jumlah test/assertions, serta error/skip. Jangan mengubah ekspektasi
+atau melewati test hanya untuk mendapatkan hijau. Pisahkan failure baseline dari regresi.
+Jika prasyarat tidak tersedia, laporkan pemeriksaan yang terblokir dan langkah lanjut.
+Tidak boleh mengklaim seluruh pemeriksaan lulus jika belum dijalankan.

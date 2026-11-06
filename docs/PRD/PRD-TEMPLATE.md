@@ -1,83 +1,49 @@
-# 📝 Template Product Requirement Document (PRD)
+# Template spesifikasi fitur
 
-Gunakan template ini untuk setiap fitur baru yang akan dirancang dan dikembangkan pada **Koneksa Platform**.
+Isi pada tugas/PR atau dokumen fitur yang diminta; tidak wajib membuat berkas baru
+untuk setiap perubahan. Gunakan ID Fxx / FR-xx.y dari
+[PRD platform](PRD-KONEKSA-PLATFORM.md).
 
----
+## Identitas dan lingkup
 
-## Metadata Dokumen
-* **Nama Fitur**: [Nama Fitur]
-* **Kode Modul**: `MOD-XXX`
-* **Penulis / Pemilik**: [Nama System Analyst / Product Owner]
-* **Target Rilis / Sprint**: [Sprint X / Tanggal]
-* **Status**: `Draft` / `In Review` / `Approved` / `In Development` / `Released`
+- Fitur/FR:
+- Pemilik dan status: Draft / Approved / In Development / Released.
+- Masalah pengguna dan hasil yang dibutuhkan:
+- Termasuk / di luar lingkup:
+- Aktor: UMKM / Mitra / Pemerintah / Admin sesuai fitur.
+- Rujukan ERD dan keputusan bisnis terkait:
 
----
+## Kontrak perilaku
 
-## 1. Latar Belakang & Masalah (Background & Problem Statement)
-* **Latar Belakang**: [Mengapa fitur ini diperlukan?]
-* **Masalah Pengguna**: [Poin kesulitan/pain point apa yang dialami pengguna saat ini tanpa adanya fitur ini?]
-* **Nilai Bisnis / Proyek**: [Dampak positif apa yang didapat setelah fitur ini selesai?]
+- Precondition: autentikasi, status akun, kepemilikan resource, izin Policy/Gate.
+- Input wajib/opsional, batas nilai dan validasi.
+- Alur sukses dan hasil data yang dapat diamati.
+- Transisi status yang diizinkan dan aktor yang boleh menjalankannya.
+- Error penting: data invalid, akses pihak lain, data hilang, submit berulang,
+  stok/kuota boundary atau concurrency bila terkait.
+- Data publik/privat dan batas ekspor/upload bila terkait.
+- Respons mengikuti [kontrak Inertia/REST](../analysis/API-SPECIFICATION-GUIDE.md):
+  form Inertia menggunakan redirect/error bag; endpoint JSON eksplisit menggunakan 422.
 
----
+## Acceptance criteria
 
-## 2. Persona Pengguna (Target User Personas)
-* **Persona Utama**: [Misal: Mahasiswa / Pengguna Terdaftar]
-* **Persona Sekunder**: [Misal: Mitra / Administrator Sistem]
+Gunakan Given–When–Then untuk perilaku nyata, misalnya:
+- Given pengguna berwenang dan input valid, When menyimpan, Then data tersimpan
+  dan halaman tujuan/feedback sesuai kontrak.
+- Given field wajib invalid, When submit, Then tidak ada mutasi dan error terkait
+  muncul melalui mekanisme Inertia atau JSON sesuai jenis endpoint.
+- Given pengguna lain tidak berhak, When mengakses/mengubah resource, Then akses ditolak
+  dan data privat tidak bocor.
 
----
+Tambahkan skenario domain terkait; jangan menambah notifikasi, queue, ilustrasi,
+real-time validation atau target performa numerik tanpa kebutuhan yang disetujui.
 
-## 3. Kebutuhan Fungsional (Functional Requirements)
-Klasifikasikan kebutuhan berdasarkan metode **MoSCoW** (*Must have, Should have, Could have, Won't have*):
+## Keterlacakan dan verifikasi
 
-| ID Kebutuhan | Deskripsi Kebutuhan | Prioritas | Aktor | Catatan Implementasi |
-| :--- | :--- | :--- | :--- | :--- |
-| `FR-001` | Pengguna dapat melakukan filter data berdasarkan kategori | Must | User | Gunakan Inertia preserveState |
-| `FR-002` | Sistem mengirimkan notifikasi instan saat status berubah | Should | System | Event & Listener Laravel |
-| `FR-003` | Pengguna dapat mengekspor rekap dalam format CSV | Could | Admin | Queue job jika data besar |
+| FR | Route/controller | Halaman/komponen | Test/perintah | Status aktual |
+|---|---|---|---|---|
+| Isi FR terkait | Isi implementasi terkait | Isi bila ada | Isi bukti aktual | Belum / sebagian / terverifikasi |
 
----
-
-## 4. Alur Pengguna (User Journey / Flow)
-1. **Langkah 1**: Pengguna mengakses halaman X.
-2. **Langkah 2**: Sistem memvalidasi izin akses dan menampilkan antarmuka.
-3. **Langkah 3**: Pengguna menginput form data dan menekan tombol simpan.
-4. **Langkah 4**: Sistem memvalidasi payload dan merespons dengan state feedback.
-
----
-
-## 5. Kebutuhan Non-Fungsional (Non-Functional Requirements)
-* **Performa**: Waktu respon server < 300ms untuk query tipikal; LCP (Largest Contentful Paint) < 2.0s.
-* **Keamanan**: Validasi otorisasi via Laravel Policy/Gate; sanitasi input terhadap XSS dan SQL Injection.
-* **Aksesibilitas**: Kontras warna sesuai WCAG AA (rujuk `docs/design-system/BASELINE-DESIGN.md`).
-* **Responsif**: Tampilan dapat digunakan secara sempurna pada resolusi ponsel (`>= 375px`) hingga desktop (`>= 1280px`).
-
----
-
-## 6. Kasus Batas & Penanganan Kesalahan (Edge Cases & Error Handling)
-* **Koneksi Terputus**: Tampilkan state banner peringatan koneksi.
-* **Data Kosong (Empty State)**: Tampilkan ilustrasi dan tombol aksi utama (*Call to Action*).
-* **Validasi Gagal**: Tampilkan pesan error inline di bawah field form terkait secara real-time.
-
----
-
-## 7. Kriteria Penerimaan (Acceptance Criteria)
-Format menggunakan standar **Given - When - Then**:
-
-* **Skenario 1: Input Valid (Happy Path)**
-  * **Given**: Pengguna berada di halaman form dengan kredensial aktif.
-  * **When**: Pengguna mengisi semua data wajib dengan format yang benar dan menekan "Submit".
-  * **Then**: Sistem menyimpan data ke basis data, mengembalikan status 200/redirect dengan flash message sukses, dan mengosongkan form.
-
-* **Skenario 2: Validasi Gagal**
-  * **Given**: Pengguna berada di form input.
-  * **When**: Pengguna mengosongkan field wajib dan menekan "Submit".
-  * **Then**: Sistem membatalkan penyimpanan, mengembalikan kode 422, dan menandai field yang belum terisi dengan highlight merah.
-
----
-
-## 8. Persyaratan Pengujian (Testing Requirements)
-* **Unit Test Wajib**:
-  * Test validasi Form Request.
-  * Test logic Service/Action class.
-* **Runner yang Harus Lolos**: `php artisan test --testsuite=Unit`
-
+Feature test untuk HTTP/DB, Unit untuk logika murni. Ikuti
+[panduan testing](../guidelines/AGENT-UNIT-TESTING.md) dan matriks AGENTS.md.
+Catat perintah, exit code/hasil, keterbatasan dan keputusan terbuka pada handoff.

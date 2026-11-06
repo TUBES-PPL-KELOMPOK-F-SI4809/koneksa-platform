@@ -1,6 +1,6 @@
 # Rancangan ERD KONEKSA
 
-Ruang lingkup: FR-01–FR-21, Laravel 13, MySQL 8. Berdasarkan proposal dan konfirmasi pemilik rancangan. Ini adalah rancangan skema, belum migration atau implementasi aplikasi.
+Ruang lingkup: FR-01–FR-21, Laravel 13, MySQL 8. Berdasarkan proposal dan konfirmasi pemilik rancangan. Ini adalah acuan rancangan data kanonis; sebagian struktur sudah diwujudkan dalam database/migrations/. Periksa migrasi, kode dan test untuk status implementasi aktual. Rancangan ini tidak menyatakan semua invariant sudah ditegakkan aplikasi.
 
 ## 1. Keputusan rancangan
 
@@ -21,7 +21,7 @@ Pilihan desain yang diusulkan, bukan fakta tambahan dari proposal:
 - Satu usaha hanya boleh memiliki satu pendaftaran per program. Banyak program tetap diperbolehkan.
 - Semua produk memiliki minimal satu varian. Produk tanpa ukuran/warna memakai varian `default`; stok dan harga berada pada varian, bukan disalin ke produk.
 - Ukuran dan warna berupa teks. Belum membutuhkan tabel atribut generik, multi-gudang, diskon, pajak, atau pembayaran.
-- Kuantitas stok adalah bilangan bulat. Jika usaha menjual berat/volume pecahan, quantity seluruh tabel terkait harus diubah menjadi DECIMAL secara konsisten sebelum migration.
+- Kuantitas stok adalah bilangan bulat. Jika kebutuhan berubah menjadi berat/volume pecahan, evaluasi quantity seluruh tabel terkait secara konsisten dan ubah melalui migrasi baru; jangan mengedit migrasi lama.
 - Proposal menghubungkan tepat satu usaha dan satu Mitra; dapat diajukan salah satu pihak. Minat UMKM pada penawaran digital disimpan sebagai proposal yang merujuk penawaran tersebut. Penerima yang memutuskan.
 - Pengajuan verifikasi menyimpan snapshot identitas usaha dan lampiran opsional, tanpa mewajibkan NIB. Pemerintah memberikan keputusan administratif, bukan sertifikasi legal.
 

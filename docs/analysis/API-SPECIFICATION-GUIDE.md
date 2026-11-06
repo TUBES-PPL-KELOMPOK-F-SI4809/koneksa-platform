@@ -1,51 +1,29 @@
-# 🔌 Panduan Spesifikasi REST API — KONEKSA Platform
+# Kontrak Inertia dan REST
 
-Dokumen ini mendefinisikan standar kontrak pertukaran data API, format envelope respon JSON, kode status HTTP, dan konvensi penanganan error pada **KONEKSA Platform**.
+Aplikasi memakai Laravel + Inertia Vue sebagai modern monolith.
+Jangan membuat REST API paralel untuk alur halaman internal tanpa kebutuhan.
 
----
+## Halaman dan form Inertia
 
-## 1. Konvensi Endpoint & HTTP Verbs
+- GET halaman mengembalikan Inertia::render dengan props yang dibutuhkan.
+- Mutasi form sukses mengembalikan redirect ke named route dan flash bila relevan.
+- Validasi memakai Form Request dan error bag Laravel/Inertia melalui redirect.
+  Jangan memaksakan envelope JSON atau respons 422 JSON pada form Inertia.
+- Periksa Policy/Gate dan kepemilikan data di server; jangan mengandalkan tombol tersembunyi.
 
-* **Bentuk Dasar URL**: `/api/v1/{resource}`
-* **Format Pengenal Resource**: Gunakan kata benda plural (`/api/v1/initiatives`, `/api/v1/products`).
+## REST eksplisit
 
-| Method | Endpoint | Fungsi | Status Sukses |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/businesses` | Mengambil daftar UMKM (filter kategori & status) | `200 OK` |
-| `GET` | `/api/v1/businesses/{id}` | Mengambil detail profil UMKM publik | `200 OK` |
-| `POST` | `/api/v1/transactions` | Mencatat transaksi penjualan kasir (atomik) | `201 Created` |
-| `POST` | `/api/v1/collaboration-requests`| Mengirimkan proposal kerja sama | `201 Created` |
-| `PATCH` | `/api/v1/verification-requests/{id}` | Menyetujui/menolak verifikasi administratif | `200 OK` |
+Aturan berikut hanya untuk endpoint JSON yang memang diminta/dipakai integrasi:
+- Prefix /api/v1, resource plural dan nama mengikuti ERD kanonis:
+  sales, collaboration-proposals, verification-requests.
+- Gunakan API Resource dan pola respons existing bila tersedia.
+- Sukses resource memakai data; koleksi paginasi memakai data, links dan meta.
+  Metadata message dapat ditambahkan bila diperlukan; success boolean tidak wajib.
+- Validasi JSON memakai 422 dengan message dan errors standar Laravel.
+  Gunakan 401 untuk belum autentikasi, 403 untuk akses ditolak, 404 untuk resource
+  yang tidak tersedia sesuai kebijakan privasi, 201 untuk create, 204 untuk delete tanpa body.
+- Tentukan kontrak request/response, izin, filter dan pagination pada tugas/PR;
+  contoh endpoint di dokumen ini bukan janji endpoint sudah diimplementasikan.
 
----
-
-## 2. Standar JSON Envelope Respon
-
-Seluruh API internal maupun integrasi wajib mengembalikan format struktur terbungkus (*envelope*) seragam:
-
-### 2.1 Respon Sukses Tunggal:
-```json
-{
-    "success": true,
-    "message": "Data transaksi berhasil disimpan",
-    "data": {
-        "id": 104,
-        "invoice_number": "INV-202611-00104",
-        "total_amount": 250000.00,
-        "transaction_date": "2026-11-06T10:00:00Z"
-    }
-}
-```
-
-### 2.2 Respon Error Validasi (`422 Unprocessable Content`):
-```json
-{
-    "success": false,
-    "message": "Data formulir tidak valid",
-    "errors": {
-        "business_name": ["Nama usaha wajib diisi."],
-        "category": ["Kategori yang dipilih tidak valid."]
-    }
-}
-```
-
+Periksa routes aktual melalui php artisan route:list. Untuk detail data/invariant,
+baca [ERD kanonis](RANCANGAN_ERD_KONEKSA.md).

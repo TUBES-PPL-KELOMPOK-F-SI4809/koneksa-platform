@@ -1,6 +1,6 @@
 # 🎯 Spesifikasi Design Tokens — Koneksa Platform
 
-Design tokens adalah variabel atomik visual terkecil yang digunakan untuk menjamin konsistensi di seluruh tampilan antarmuka Koneksa Platform.
+Dokumen ini adalah spesifikasi visual kanonis, bukan bukti seluruh token sudah tersedia sebagai CSS variable/objek runtime. Periksa resources/css/app.css dan tailwind.config.js sebelum memakai token; tambahkan mapping yang diperlukan dalam lingkup tugas. Jangan mengasumsikan ThemeProvider tersedia. Baseline proyek mengungguli preferensi estetika skills.
 
 ---
 

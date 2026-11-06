@@ -1,24 +1,21 @@
-# Backend Rules (Laravel 13 & PHP 8.4+)
+# Backend — Laravel
 
-1. **Feature Development Guide**:
-   - Ikuti hierarki `app/Http/Controllers/{Feature}/`, `app/Http/Requests/{Feature}/`, dan `app/Services/{Feature}/{Feature}Service.php`.
-   - Thin Controller: Controller hanya memanggil Form Request dan Service Layer, lalu merender Inertia view.
-2. **Anti Over-Engineering (KISS & YAGNI)**:
-   - Pilih solusi paling sederhana dan langsung.
-   - Dilarang membuat Repository Pattern generik; panggil Eloquent Model langsung di dalam Service Layer.
-   - Dilarang membuat Interface atau Abstract Class jika hanya ada satu implementasi konkret saat ini.
-   - Dilarang membuat layer indirection (seperti Action/Processor/Pipeline berantai) untuk logika yang sederhana.
-3. **Cek Dependensi & Pustaka Bawaan Terlebih Dahulu**:
-   - Cek `composer.json` sebelum membuat helper atau menginstal paket baru.
-   - Gunakan Laravel Collections (`collect()`), `Str`, `Arr`, `Carbon` daripada menulis manual loop atau parsing tanggal.
-4. **Database Migrations**:
-   - Dilarang mengedit file migrasi lama.
-   - Buat migrasi baru jika ada penyesuaian kolom (`php artisan make:migration ...`).
-   - Kolom baru wajib `nullable()` atau memiliki `default()`.
-5. **Best Practices**:
-   - Aktifkan `.antigravity/skills/laravel-best-practices/SKILL.md`.
-   - Gunakan Eloquent ORM, hindari N+1 query (`with(...)`).
-   - Otorisasi menggunakan Laravel Gates / Policies, jangan hardcode role check di controller.
-6. **Code Style**:
-   - Jalankan `vendor/bin/pint --dirty --format agent` sebelum selesai.
+Ikuti [AGENTS.md](../../AGENTS.md). Konfirmasi versi terpasang melalui Composer;
+jangan menyimpulkan runtime dari contoh dokumentasi.
 
+- Baca kode sekitar dan callers; pertahankan konvensi, kecuali ada cacat kebenaran/keamanan.
+- Gunakan Form Request untuk validasi, middleware/Policy/Gate untuk akses.
+  Uji role, kepemilikan resource, dan data privat pada batas HTTP.
+- Controller tetap ringkas; service domain untuk transaksi/multi-langkah.
+  Pemanggilan service sinkron diperbolehkan. Hindari repository/interface/event tanpa kebutuhan nyata.
+- Gunakan Eloquent, eager loading, Collections, Str/Arr, dan Carbon bila sesuai.
+  Loop sederhana tetap boleh; jangan mengganti kode yang jelas demi memaksakan helper.
+- Baca [ERD](../../docs/analysis/RANCANGAN_ERD_KONEKSA.md) dan migrasi aktual.
+  Mutasi stok/penjualan/kuota mengikuti transaksi dan locking pada ERD.
+- Gunakan named routes dan Inertia::render untuk halaman; API Resource hanya untuk endpoint API.
+- PHP: type hint parameter/return, kurung kurawal semua control structure,
+  constructor promotion bila sesuai, enum case TitleCase, PHPDoc shape untuk array kompleks.
+- Gunakan Artisan make:* --no-interaction. Feature test adalah default untuk HTTP/DB;
+  --unit hanya untuk logika murni. Jalankan Pint bila PHP berubah.
+- Boost search-docs untuk API sensitif versi; fallback ke sumber terpasang/resmi.
+  route:list melalui CLI; baca config tanpa menampilkan secret.
