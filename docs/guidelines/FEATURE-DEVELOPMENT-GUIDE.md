@@ -195,10 +195,10 @@ public function down(): void
 ## 3. Panduan Penambahan Package / Library Baru
 
 ### 3.1 Penambahan Third-Party Package (Composer / NPM)
-Sebelum menambahkan dependensi eksternal, ikuti protokol RFC di [STACK-ADDITION-GUIDELINES.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack/STACK-ADDITION-GUIDELINES.md):
+Sebelum menambahkan dependensi eksternal, ikuti protokol RFC di [STACK-ADDITION-GUIDELINES.md](../tech-stack/STACK-ADDITION-GUIDELINES.md):
 1. Periksa apakah fitur tersebut benar-benar membutuhkan dependensi luar.
 2. Jalankan audit keamanan (`composer audit` / `npm audit`).
-3. Catat di tabel log [CURRENT-STACK.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack/CURRENT-STACK.md).
+3. Catat di tabel log [CURRENT-STACK.md](../tech-stack/CURRENT-STACK.md).
 
 ### 3.2 Pembuatan Internal Modular Package (Opsional)
 Jika di kemudian hari tim memutuskan untuk memisahkan domain menjadi *local package* terpisah di dalam repositori:

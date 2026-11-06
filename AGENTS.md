@@ -10,19 +10,19 @@ Dokumen ini berisi aturan kerja wajib (Mandatory Operational Rules) untuk setiap
 
 ### 1. Pemetaan Wajib Berkas `docs/` yang Harus Dibaca:
 * **Pengembangan Fitur & Logika Bisnis (Backend/Frontend)**:
-  - 📖 [docs/PRD/PRD-KONEKSA-PLATFORM.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/PRD/PRD-KONEKSA-PLATFORM.md) — untuk memahami lingkup 21 fitur, aktor, dan aturan bisnis.
-  - 📖 [docs/analysis/DATABASE-SCHEMA.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/analysis/DATABASE-SCHEMA.md) — untuk memahami ERD dan struktur tabel terkait.
+  - 📖 [docs/PRD/PRD-KONEKSA-PLATFORM.md](docs/PRD/PRD-KONEKSA-PLATFORM.md) — untuk memahami lingkup 21 fitur, aktor, dan aturan bisnis.
+  - 📖 [docs/analysis/DATABASE-SCHEMA.md](docs/analysis/DATABASE-SCHEMA.md) — untuk memahami ERD dan struktur tabel terkait.
 * **Perancangan Antarmuka & Komponen UI**:
-  - 📖 [docs/design-system/BASELINE-DESIGN.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/BASELINE-DESIGN.md) — filosofi visual dan ritme layout.
-  - 📖 [docs/design-system/DESIGN-TOKENS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/DESIGN-TOKENS.md) — warna, tipografi, radius, elevasi.
-  - 📖 [docs/design-system/STYLED-COMPONENTS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/STYLED-COMPONENTS.md) — panduan CSS-in-JS dan tema.
+  - 📖 [docs/design-system/BASELINE-DESIGN.md](docs/design-system/BASELINE-DESIGN.md) — filosofi visual dan ritme layout.
+  - 📖 [docs/design-system/DESIGN-TOKENS.md](docs/design-system/DESIGN-TOKENS.md) — warna, tipografi, radius, elevasi.
+  - 📖 [docs/design-system/STYLED-COMPONENTS.md](docs/design-system/STYLED-COMPONENTS.md) — panduan CSS-in-JS dan tema.
 * **Struktur Kode, Pembuatan File/Folder, & Migrasi Database**:
-  - 📖 [docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md) — SOP pembuatan file baru.
-  - 📖 [docs/guidelines/CLEAN-CODE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/CLEAN-CODE.md) — prinsip anti-regresi dan thin controller.
+  - 📖 [docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md](docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md) — SOP pembuatan file baru.
+  - 📖 [docs/guidelines/CLEAN-CODE.md](docs/guidelines/CLEAN-CODE.md) — prinsip anti-regresi dan thin controller.
 * **Pengujian Fitur**:
-  - 📖 [docs/guidelines/AGENT-UNIT-TESTING.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/AGENT-UNIT-TESTING.md) — format AAA dan eksekusi test runner.
+  - 📖 [docs/guidelines/AGENT-UNIT-TESTING.md](docs/guidelines/AGENT-UNIT-TESTING.md) — format AAA dan eksekusi test runner.
 * **Penambahan Dependensi Baru**:
-  - 📖 [docs/tech-stack/STACK-ADDITION-GUIDELINES.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack/STACK-ADDITION-GUIDELINES.md) — prosedur pengisian RFC.
+  - 📖 [docs/tech-stack/STACK-ADDITION-GUIDELINES.md](docs/tech-stack/STACK-ADDITION-GUIDELINES.md) — prosedur pengisian RFC.
 
 ### 2. Kewajiban Mengaktifkan Skills di `.agents/` dan `.antigravity/`:
 Agent wajib membaca `SKILL.md` dan mengaktifkan keahlian berikut sesuai domain tugas:
@@ -63,7 +63,7 @@ Agent wajib membaca `SKILL.md` dan mengaktifkan keahlian berikut sesuai domain t
 4. **Verifikasi Output**:
    - Agent wajib memeriksa return code (`exit code 0`) dan memverifikasi assertion lulus. Jika ada failure atau error, Agent wajib memperbaiki kode/test secara mandiri sebelum menyerahkan ke user.
 
-Detail panduan dan konvensi pengujian dapat dibaca pada [AGENT-UNIT-TESTING.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/AGENT-UNIT-TESTING.md).
+Detail panduan dan konvensi pengujian dapat dibaca pada [AGENT-UNIT-TESTING.md](docs/guidelines/AGENT-UNIT-TESTING.md).
 
 ---
 
@@ -92,12 +92,12 @@ Detail panduan dan konvensi pengujian dapat dibaca pada [AGENT-UNIT-TESTING.md](
 ## 3. Kepatuhan Baseline Desain & Styling
 
 1. **Gunakan Design Baseline & Tokens**:
-   - Selalu rujuk [BASELINE-DESIGN.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/BASELINE-DESIGN.md) dan [DESIGN-TOKENS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/DESIGN-TOKENS.md).
+   - Selalu rujuk [BASELINE-DESIGN.md](docs/design-system/BASELINE-DESIGN.md) dan [DESIGN-TOKENS.md](docs/design-system/DESIGN-TOKENS.md).
    - Dilarang menggunakan nilai warna atau spacing arbitrer (*hardcoded hex/magic numbers*) jika sudah didefinisikan dalam design tokens.
 2. **Penggunaan `styled-components` & Tailwind CSS**:
    - Manfaatkan `styled-components` untuk isolated custom styling, dynamic prop-driven styles, theme provider consumption, dan reusable styled UI primitives.
    - Manfaatkan Tailwind CSS untuk utility layouting cepat (flex, grid, spacing, container).
-   - Jangan menimbulkan style conflict antara inline utility dan styled definitions. Rujuk [STYLED-COMPONENTS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/STYLED-COMPONENTS.md).
+   - Jangan menimbulkan style conflict antara inline utility dan styled definitions. Rujuk [STYLED-COMPONENTS.md](docs/design-system/STYLED-COMPONENTS.md).
 3. **Pemanfaatan Skills**:
    - Gunakan skill `ui-ux-pro-max` saat mendesain layout, pemilihan kontras warna WCAG AA, micro-animations, dan struktur interaktif.
    - Gunakan skill `taste-design` untuk memastikan visual hierarchy modern, clean, anti-generic, dan proporsional.
@@ -110,7 +110,7 @@ Detail panduan dan konvensi pengujian dapat dibaca pada [AGENT-UNIT-TESTING.md](
 1. **Lokasi Dokumentasi**:
    - Semua dokumentasi analisis sistem, PRD, baseline desain, panduan arsitektur, dan penambahan stack harus ditempatkan di folder `docs/`.
 2. **Aturan Penambahan Tech Stack Baru**:
-   - Jika Agent atau tim mengusulkan penambahan dependensi baru (composer package atau npm package signifikan), Agent WAJIB memperbarui dokumentasi di `docs/tech-stack/` mengikuti [STACK-ADDITION-GUIDELINES.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack/STACK-ADDITION-GUIDELINES.md).
+   - Jika Agent atau tim mengusulkan penambahan dependensi baru (composer package atau npm package signifikan), Agent WAJIB memperbarui dokumentasi di `docs/tech-stack/` mengikuti [STACK-ADDITION-GUIDELINES.md](docs/tech-stack/STACK-ADDITION-GUIDELINES.md).
 
 ---
 
@@ -121,7 +121,7 @@ Detail panduan dan konvensi pengujian dapat dibaca pada [AGENT-UNIT-TESTING.md](
 ### Aturan Ketat untuk Agent:
 1. **Dilarang Merusak Fitur Lain (Feature Isolation)**:
    - Dilarang menumpuk kode fitur baru ke dalam Controller, Model, atau Service milik fitur lain.
-   - Setiap fitur baru harus memiliki **Controller**, **Form Request**, dan **Service Layer** tersendiri sesuai panduan [FEATURE-DEVELOPMENT-GUIDE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
+   - Setiap fitur baru harus memiliki **Controller**, **Form Request**, dan **Service Layer** tersendiri sesuai panduan [FEATURE-DEVELOPMENT-GUIDE.md](docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
    - Hubungkan antar-fitur hanya melalui *interface*, *event*, atau *listener* yang terisolasi.
 2. **Pola Thin Controller & Dedicated Service**:
    - Controller dilarang memuat logika bisnis rumit atau raw queries.
@@ -140,7 +140,7 @@ Detail panduan dan konvensi pengujian dapat dibaca pada [AGENT-UNIT-TESTING.md](
      php artisan test --testsuite=Unit
      ```
 
-Detail lengkap baca di [CLEAN-CODE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/CLEAN-CODE.md) dan [FEATURE-DEVELOPMENT-GUIDE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
+Detail lengkap baca di [CLEAN-CODE.md](docs/guidelines/CLEAN-CODE.md) dan [FEATURE-DEVELOPMENT-GUIDE.md](docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
 
 ---
 

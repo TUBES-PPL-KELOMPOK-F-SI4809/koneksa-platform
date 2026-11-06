@@ -9,9 +9,9 @@ always_on: true
 Sebelum Agent mulai merancang, memodifikasi, atau menulis kode:
 
 1. **Wajib Membaca Dokumen Terkait di `docs/`**:
-   - Jika membuat/mengubah fitur: Wajib membaca [docs/PRD/PRD-KONEKSA-PLATFORM.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/PRD/PRD-KONEKSA-PLATFORM.md) dan [docs/analysis/DATABASE-SCHEMA.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/analysis/DATABASE-SCHEMA.md).
-   - Jika membuat antarmuka UI: Wajib membaca [docs/design-system/BASELINE-DESIGN.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/BASELINE-DESIGN.md) dan [docs/design-system/DESIGN-TOKENS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/DESIGN-TOKENS.md).
-   - Jika membuat berkas/folder/service baru: Wajib membaca [docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md) dan [docs/guidelines/CLEAN-CODE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/CLEAN-CODE.md).
+   - Jika membuat/mengubah fitur: Wajib membaca [docs/PRD/PRD-KONEKSA-PLATFORM.md](../../docs/PRD/PRD-KONEKSA-PLATFORM.md) dan [docs/analysis/DATABASE-SCHEMA.md](../../docs/analysis/DATABASE-SCHEMA.md).
+   - Jika membuat antarmuka UI: Wajib membaca [docs/design-system/BASELINE-DESIGN.md](../../docs/design-system/BASELINE-DESIGN.md) dan [docs/design-system/DESIGN-TOKENS.md](../../docs/design-system/DESIGN-TOKENS.md).
+   - Jika membuat berkas/folder/service baru: Wajib membaca [docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md](../../docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md) dan [docs/guidelines/CLEAN-CODE.md](../../docs/guidelines/CLEAN-CODE.md).
 
 2. **Wajib Memeriksa & Membaca Skill Terkait**:
    - Backend Laravel: Baca `.antigravity/skills/laravel-best-practices/SKILL.md`

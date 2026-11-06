@@ -185,14 +185,16 @@ node .agents/skills/playwright/scripts/playwright-cli.js --help
 
 ## 📚 7. Direktori Dokumentasi Proyek (`docs/`)
 
-Seluruh dokumentasi teknis dan perancangan tersimpan secara terpusat di folder [`docs/`](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs):
+Untuk mempermudah koordinasi seluruh anggota tim pengembang (Dev 1 s/d Dev 7) dan memastikan standardisasi pengerjaan, seluruh dokumen acuan teknis disimpan secara terpusat pada direktori [`docs/`](docs/):
 
-* [**`docs/PRD/`**](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/PRD): Product Requirement Document (PRD Baseline & Template).
-* [**`docs/analysis/`**](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/analysis): Spesifikasi Use Case, Diagram Relasi Basis Data (ERD), Panduan REST API.
-* [**`docs/design-system/`**](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system): Baseline Desain Website, Panduan `styled-components`, dan Token Desain.
-* [**`docs/guidelines/`**](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines): Panduan Clean Code, SOP Pembuatan Fitur/Folder/Database, Aturan Unit Test, Standar Git.
-* [**`docs/tech-stack/`**](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack): Inventaris Tech Stack Aktif dan Protokol RFC Penambahan Stack Baru.
-* [**`AGENTS.md`**](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/AGENTS.md): Aturan Operasional Wajib bagi AI Coding Agent.
+| Direktori / Dokumen | Fungsi & Relevansi bagi Tim Pengembang | Tautan Dokumen |
+| :--- | :--- | :--- |
+| **`docs/PRD/`** | **Kebutuhan Fitur & Bisnis**: Berisi spesifikasi detail 21 fitur utama (F01–F21), 42 functional requirements, karakteristik aktor, batasan sistem, dan template penulisan PRD per sprint. | • [PRD Baseline KONEKSA](docs/PRD/PRD-KONEKSA-PLATFORM.md)<br>• [Template PRD Fitur](docs/PRD/PRD-TEMPLATE.md) |
+| **`docs/analysis/`** | **Rekayasa Sistem & Basis Data**: Berisi acuan skema relasional ERD (MySQL 8), aturan transaksi atomik penjualan & kuota, spesifikasi use case UML, dan standar response REST API. | • [Skema Database & ERD](docs/analysis/DATABASE-SCHEMA.md)<br>• [Panduan System Analyst](docs/analysis/SYSTEM-ANALYST-GUIDELINES.md)<br>• [Kontrak REST API](docs/analysis/API-SPECIFICATION-GUIDE.md) |
+| **`docs/design-system/`** | **UI/UX & Styling Antarmuka**: Acuan wajib bagi pengerjaan frontend Vue 3, adopsi komponen `shadcn-ui`, panduan `styled-components`, serta spesifikasi token warna, tipografi, dan elevasi. | • [Baseline Desain Website](docs/design-system/BASELINE-DESIGN.md)<br>• [Token Desain Visual](docs/design-system/DESIGN-TOKENS.md)<br>• [Panduan styled-components](docs/design-system/STYLED-COMPONENTS.md) |
+| **`docs/guidelines/`** | **Standar Koding & Kualitas (SOP)**: SOP langkah demi langkah membuat file/folder fitur baru, aturan Clean Code & isolasi modul anti-regresi, panduan unit testing wajib (AAA pattern), dan konvensi commit Git. | • [SOP Pembuatan Fitur & Folder](docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md)<br>• [Panduan Clean Code](docs/guidelines/CLEAN-CODE.md)<br>• [Panduan Unit Testing](docs/guidelines/AGENT-UNIT-TESTING.md)<br>• [Standar Git Workflow](docs/guidelines/GIT-WORKFLOW.md) |
+| **`docs/tech-stack/`** | **Tata Kelola Dependensi**: Inventaris dependensi resmi aktif (Laravel, Inertia, Vue, Tailwind, styled-components) dan prosedur pengajuan RFC jika anggota tim ingin menambah library/package baru. | • [Inventaris Tech Stack](docs/tech-stack/CURRENT-STACK.md)<br>• [Prosedur RFC Stack Baru](docs/tech-stack/STACK-ADDITION-GUIDELINES.md) |
+| **`AGENTS.md`** | **Pedoman AI Coding Assistant**: Aturan wajib jika anggota tim menggunakan asisten AI (Antigravity, Cursor, Copilot, Claude) saat coding agar kode yang di-generate mematuhi arsitektur tim. | • [Instruksi Operasional AI Agent](AGENTS.md) |
 
 ---
 

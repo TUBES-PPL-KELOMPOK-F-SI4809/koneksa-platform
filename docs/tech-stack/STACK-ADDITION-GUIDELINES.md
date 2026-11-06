@@ -42,7 +42,7 @@ Setiap penambahan dependensi membawa biaya jangka panjang (*maintenance cost*, p
    - Tulis unit test untuk memvalidasi fungsi yang memanfaatkan pustaka baru tersebut.
 5. **Pembaruan Berkas Dokumentasi**:
    - Catat paket baru di tabel riwayat di bawah ini.
-   - Perbarui berkas [CURRENT-STACK.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack/CURRENT-STACK.md).
+   - Perbarui berkas [CURRENT-STACK.md](CURRENT-STACK.md).
 
 ---
 

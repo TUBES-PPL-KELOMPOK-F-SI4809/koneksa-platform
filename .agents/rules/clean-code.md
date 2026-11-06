@@ -10,7 +10,7 @@ Saat merancang atau mengimplementasikan fitur baru:
 
 1. **Isolasi Fitur & Anti-Efek Samping**:
    - Dilarang menambahkan logika fitur baru ke controller atau model milik fitur lain secara langsung.
-   - Buat file terpisah mengikuti [FEATURE-DEVELOPMENT-GUIDE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
+   - Buat file terpisah mengikuti [FEATURE-DEVELOPMENT-GUIDE.md](../../docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
    - Controller wajib ramping (*Thin Controller*): delegasikan validasi ke Form Request dan logika bisnis ke Service Class (`app/Services/{Feature}/`).
 
 2. **Integritas Basis Data**:

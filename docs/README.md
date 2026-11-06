@@ -41,14 +41,14 @@ docs/
 
 1. **Clean Code & Isolasi Fitur (Anti-Regresi)**:
    - Dilarang menumpuk kode fitur baru ke dalam berkas fitur lain. Gunakan **Thin Controller**, **Dedicated Form Request**, dan **Service Layer** agar penambahan fitur tidak memicu bug pada fitur lain.
-   - Baca [CLEAN-CODE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/CLEAN-CODE.md) dan [FEATURE-DEVELOPMENT-GUIDE.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
+   - Baca [CLEAN-CODE.md](guidelines/CLEAN-CODE.md) dan [FEATURE-DEVELOPMENT-GUIDE.md](guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
 
 2. **Test-Driven & Verifikasi Mandiri**:
    - Setiap fitur yang selesai dikerjakan **WAJIB** disertai unit test yang lulus (green). AI Agent dan developer dilarang menutup tugas sebelum test lulus.
-   - Baca [AGENT-UNIT-TESTING.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/guidelines/AGENT-UNIT-TESTING.md).
+   - Baca [AGENT-UNIT-TESTING.md](guidelines/AGENT-UNIT-TESTING.md).
 
 3. **Konsistensi Desain Antarmuka & Prinsip Shadcn-First**:
-   - Pembangunan tampilan antarmuka wajib mengacu pada [BASELINE-DESIGN.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/BASELINE-DESIGN.md).
+   - Pembangunan tampilan antarmuka wajib mengacu pada [BASELINE-DESIGN.md](design-system/BASELINE-DESIGN.md).
    - **Wajib Shadcn-First**: Selalu cek ketersediaan komponen di `shadcn-ui` sebelum membuat komponen sendiri dari nol. Padukan dengan `styled-components` dan Tailwind CSS sesuai token desain.
 
 4. **Ecosystem-First & CLI-First**:
@@ -57,8 +57,8 @@ docs/
 
 5. **Tertib Penambahan Stack & Skema Database**:
    - Dilarang mengedit migrasi lama. Penambahan kolom wajib *nullable* atau memiliki *default*.
-   - Dilarang menambahkan dependensi/package sembarangan tanpa evaluasi RFC pada [STACK-ADDITION-GUIDELINES.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/tech-stack/STACK-ADDITION-GUIDELINES.md).
+   - Dilarang menambahkan dependensi/package sembarangan tanpa evaluasi RFC pada [STACK-ADDITION-GUIDELINES.md](tech-stack/STACK-ADDITION-GUIDELINES.md).
 
 6. **Keterlacakan Analisis (Traceability)**:
-   - Setiap kode yang dibangun harus dapat dirunut balik ke Use Case di [analysis/](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/analysis/) dan kebutuhan pengguna di [PRD/](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/PRD/).
+   - Setiap kode yang dibangun harus dapat dirunut balik ke Use Case di [analysis/](analysis/) dan kebutuhan pengguna di [PRD/](PRD/).
 

@@ -11,7 +11,7 @@ Seluruh pemodelan sistem menggunakan Visual Paradigm dengan notasi UML standar:
 1. **Use Case Diagram**: Memetakan interaksi 4 aktor utama (UMKM, Mitra Industri, Pemerintah Daerah, Admin) terhadap 21 kelompok fitur inti.
 2. **Activity Diagram**: Menggambarkan alur kerja prosedural bisnis (misal: Transaksi Penjualan, Pendaftaran Program, dan Verifikasi Berkas).
 3. **Sequence Diagram**: Memvisualisasikan pertukaran pesan antar-layer (Browser Vue -> Route -> Controller -> Service -> Database MySQL).
-4. **Entity-Relationship Diagram (ERD)** / **Class Diagram**: Menjelaskan entitas data relasional (lihat [DATABASE-SCHEMA.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/analysis/DATABASE-SCHEMA.md)).
+4. **Entity-Relationship Diagram (ERD)** / **Class Diagram**: Menjelaskan entitas data relasional (lihat [DATABASE-SCHEMA.md](DATABASE-SCHEMA.md)).
 
 ---
 

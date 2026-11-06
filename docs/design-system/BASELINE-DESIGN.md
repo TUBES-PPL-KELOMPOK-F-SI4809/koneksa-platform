@@ -37,7 +37,7 @@ Sistem warna Koneksa menggunakan model token semantik untuk mendukung konsistens
 | **Semantic Warning** | `color-warning-500` | `#F59E0B` (Amber) | Peringatan batas waktu, review pending |
 | **Semantic Danger** | `color-danger-500` | `#EF4444` (Rose) | Aksi destruktif, pesan validasi error |
 
-> Rincian kode hex dan varian tints lengkap dapat dilihat di [DESIGN-TOKENS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/DESIGN-TOKENS.md).
+> Rincian kode hex dan varian tints lengkap dapat dilihat di [DESIGN-TOKENS.md](DESIGN-TOKENS.md).
 
 ---
 
@@ -104,7 +104,7 @@ Pola integrasi antarmuka:
 └───────────────────────────┴────────────────────────────────────────────┘
 ```
 
-Untuk petunjuk penulisan dan integrasi kode, pelajari [STYLED-COMPONENTS.md](file:///home/naabilfikry/Documents/Punya NAFI/KULIAH/MATKUL/PPL/TUBES/koneksa-platform/docs/design-system/STYLED-COMPONENTS.md).
+Untuk petunjuk penulisan dan integrasi kode, pelajari [STYLED-COMPONENTS.md](STYLED-COMPONENTS.md).
 
 ---
 
