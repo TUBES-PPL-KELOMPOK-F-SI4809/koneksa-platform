@@ -20,6 +20,7 @@ class RegistrationTest extends TestCase
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
+            'role' => 'umkm',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
@@ -27,5 +28,59 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_users_can_register_as_mitra_or_pemda(): void
+    {
+        $responseMitra = $this->post('/register', [
+            'name' => 'Mitra User',
+            'role' => 'mitra',
+            'email' => 'mitra@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $responseMitra->assertRedirect(route('dashboard', absolute: false));
+
+        auth()->logout();
+
+        $responsePemda = $this->post('/register', [
+            'name' => 'Pemda User',
+            'role' => 'pemda',
+            'email' => 'pemda@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $responsePemda->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_users_cannot_register_without_role(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'email' => 'norole@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertGuest();
+    }
+
+    public function test_users_cannot_register_with_invalid_role(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'role' => 'invalid_role',
+            'email' => 'invalid@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertGuest();
     }
 }
