@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --color-surface-white: #FFFFFF;
+        --color-surface-canvas: #F4F6F9;
+        --color-surface-muted: #F1F5F9;
+        --color-border-hairline: #E2E8F0;
+        --color-border-strong: #CBD5E1;
+        --color-ink-primary: #0F172A;
+        --color-ink-hover: #1E293B;
+        --color-ink-deep: #020617;
+        --color-ink-secondary: #475569;
+        --color-ink-muted: #64748B;
+        --color-accent-blue: #0070F3;
+        --color-accent-blue-light: #EFF6FF;
+        --sidebar: #FFFFFF;
+        --sidebar-foreground: #0F172A;
+        --sidebar-primary: #4F46E5;
+        --sidebar-primary-foreground: #FFFFFF;
+        --sidebar-accent: #EEF2FF;
+        --sidebar-accent-foreground: #4338CA;
+        --sidebar-border: #E2E8F0;
+        --sidebar-ring: #6366F1;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        background-color: #F4F6F9;
+        color: #0F172A;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}

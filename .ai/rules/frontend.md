@@ -1,6 +1,6 @@
 # Frontend — Vue/Inertia
 
-Ikuti [AGENTS.md](../../AGENTS.md) dan [baseline UI](../../docs/design-system/BASELINE-DESIGN.md).
+Ikuti [AGENTS.md](../../AGENTS.md), [baseline UI](../../docs/design-system/BASELINE-DESIGN.md), dan [contoh implementasi UI](../../docs/design-system/FRONTEND-UI-EXAMPLES.md) di `docs/design-system/examples/` (desain Modern Bento Dashboard dengan `ui/sidebar` shadcn, palet Indigo/Cyan Laravel Breeze, dan progressive disclosure yang ramah pengguna awam).
 
 - Vue 3 Composition API, script setup, satu root untuk komponen Inertia.
   Halaman di resources/js/Pages/{Feature}/, partial fitur di Partials/,
