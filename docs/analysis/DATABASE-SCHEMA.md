@@ -25,3 +25,10 @@ Sumber rancangan tunggal adalah [RANCANGAN_ERD_KONEKSA.md](RANCANGAN_ERD_KONEKSA
 - **Nama Non-Kanonis yang Tidak Dipakai**: Nama konseptual awal seperti `umkm_profiles`, `transactions`, `transaction_items`, `collaboration_requests`, `collaborations` (terpisah dari proposal), `collaboration_results` (terpisah), `business_needs` (tabel terpisah), atau `program_invitations` (tabel terpisah) telah dikonsolidasikan ke dalam struktur kanonis di atas agar bebas duplikasi dan tetap sederhana.
 
 Untuk tata cara pembuatan migrasi dan model baru, ikuti [panduan pengembangan fitur](../guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
+
+## 3. Kontrak Restock (`FR-06.1`, `KSA-20`)
+
+- `GET /umkm/inventory` (`umkm.inventory.index`) menampilkan stok varian aktif dan riwayat perubahan stok milik akun UMKM yang sedang login. Daftar stok dan riwayat dipaginasi terpisah melalui `stock_page` dan `history_page`; riwayat produk/varian yang diarsipkan tetap tersedia.
+- `POST /umkm/inventory/{variant}/restocks` (`umkm.inventory.restocks.store`) menerima `quantity` (bilangan bulat positif) dan `notes` (opsional, maksimal 2.000 karakter). Role UMKM aktif dan kepemilikan produk diperiksa di server; produk/varian yang diarsipkan tidak menerima restock.
+- `RestockService` mengunci produk lalu varian dengan `lockForUpdate()` di dalam `DB::transaction`. Penambahan saldo dan pembuatan ledger `type = restock` dilakukan atomik; `performed_by`, `product_variant_id`, dan `quantity_delta` ditentukan server. Kegagalan penyimpanan membatalkan seluruh perubahan.
+- Saldo akhir dibatasi maksimal `2.147.483.647` sesuai kolom `INTEGER` bertanda pada migrasi aktif. Tidak ada perubahan skema untuk implementasi ini. Verifikasi konkurensi/penguncian tetap memerlukan database test MySQL; SQLite tidak membuktikan perilaku penguncian baris.
