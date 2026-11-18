@@ -1,12 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ProfileController;
-use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\PartnerProfile;
-use App\Models\User;
-use App\Services\AuditLogService;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -92,29 +90,12 @@ Route::middleware(['auth', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', fn () => Inertia::render('Admin/Dashboard'))->name('dashboard');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
-        Route::get('/users', fn () => response()->json(['users' => User::all()]))
-            ->can('viewAny', User::class)
-            ->name('users.index');
-        Route::patch('/users/{user}/status', function (User $user, Request $request) {
-            $oldStatus = $user->account_status;
-            $newStatus = $request->input('account_status', User::STATUS_DISABLED);
-            $user->update(['account_status' => $newStatus]);
 
-            app(AuditLogService::class)->log(
-                AuditLog::MODULE_SUPERADMIN,
-                'user.status_toggled',
-                "Superadmin mengubah status akun pengguna {$user->name} dari {$oldStatus} ke {$newStatus}",
-                $user,
-                ['old_status' => $oldStatus, 'new_status' => $newStatus]
-            );
-
-            return response()->json(['message' => 'Status akun pengguna diperbarui', 'user' => $user]);
-        })->can('manageStatus', 'user')->name('users.status');
-        Route::delete('/users/{user}', function (User $user) {
-            $user->delete();
-
-            return response()->json(['message' => 'Pengguna berhasil dihapus']);
-        })->can('delete', 'user')->name('users.destroy');
+        // Manajemen Pengguna & Pembuatan Akun Pemda (KSA-38, KSA-39, KSA-40)
+        Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+        Route::post('/users/pemda', [UserManagementController::class, 'storePemda'])->name('users.pemda.store');
+        Route::patch('/users/{user}/status', [UserManagementController::class, 'updateStatus'])->name('users.status');
+        Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
     });
 
 require __DIR__.'/auth.php';

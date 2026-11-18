@@ -173,7 +173,7 @@ class AuditLogTest extends TestCase
         $umkm = User::factory()->umkm()->create(['account_status' => User::STATUS_ENABLED]);
 
         $this->actingAs($admin)
-            ->patch(route('admin.users.status', $umkm), [
+            ->patchJson(route('admin.users.status', $umkm), [
                 'account_status' => User::STATUS_DISABLED,
             ])
             ->assertOk();
