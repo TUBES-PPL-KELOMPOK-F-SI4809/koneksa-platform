@@ -12,6 +12,8 @@ class PasswordController extends Controller
 {
     /**
      * Update the user's password.
+     * Memverifikasi password lama, melakukan hashing password baru,
+     * serta mereset flag must_change_password (FR-02.2, BR-01).
      */
     public function update(Request $request): RedirectResponse
     {
@@ -22,8 +24,9 @@ class PasswordController extends Controller
 
         $request->user()->update([
             'password' => Hash::make($validated['password']),
+            'must_change_password' => false,
         ]);
 
-        return back();
+        return back()->with('status', 'password-updated');
     }
 }
