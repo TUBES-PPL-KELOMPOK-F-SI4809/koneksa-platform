@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\AuditLogService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +39,15 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        app(AuditLogService::class)->log(
+            AuditLog::MODULE_AUTH,
+            'user.registered',
+            "Pengguna {$user->name} mendaftar sebagai peran {$user->role}",
+            $user,
+            ['email' => $user->email, 'role' => $user->role],
+            $user
+        );
 
         return redirect(route('dashboard', absolute: false));
     }
