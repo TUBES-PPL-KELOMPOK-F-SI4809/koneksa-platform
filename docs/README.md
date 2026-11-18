@@ -16,6 +16,7 @@ Dokumen di sini menjelaskan kontrak domain; aturan operasional tidak disalin per
 | Struktur fitur | [Pengembangan](guidelines/FEATURE-DEVELOPMENT-GUIDE.md), [Clean Code](guidelines/CLEAN-CODE.md) |
 | Verifikasi | [Testing](guidelines/AGENT-UNIT-TESTING.md) |
 | Commit, push dan PR | [Git workflow](guidelines/GIT-WORKFLOW.md) |
+| Log Prompt AI Sprint 1 | [Log Prompt AI](guidelines/AI-PROMPT-LOG-SPRINT-1.md) |
 | Stack aktif dan keterbatasan | [Stack](tech-stack/CURRENT-STACK.md) |
 | Dependensi baru | [Prosedur stack](tech-stack/STACK-ADDITION-GUIDELINES.md) |
 
