@@ -2,7 +2,10 @@
 
 Dokumen ini memetakan **contoh implementasi konkret UI frontend** yang tersimpan di direktori [`docs/design-system/examples/`](examples/) sebagai blueprint langsung bagi developer dan AI coding agent saat mengimplementasikan halaman maupun komponen Vue 3 / Inertia / Tailwind v3 pada proyek Koneksa.
 
-> **Status Repositori**: Kode aplikasi aktif di `resources/` dan `routes/web.php` tetap dipertahankan pada baseline awal proyek (Laravel Breeze). Saat mengimplementasikan fitur nyata sesuai PRD, salin atau adaptasi konfigurasi, komponen, layout, dan halaman dari [`docs/design-system/examples/`](examples/) ke lokasi produksi terkait.
+> **Wajib bagi Seluruh AI Agent di Semua Device Developer**:
+> 1. **Periksa Contoh Sebelum Koding**: Sebelum mengimplementasikan halaman atau komponen UI di `resources/js/`, AI agent **wajib membuka dokumen ini dan mempelajari berkas blueprint terkait di `docs/design-system/examples/`**.
+> 2. **Keseragaman Visual Antar-Developer**: Seluruh antarmuka yang dibangun harus mengacu pada pola *Modern Bento Dashboard*, adaptasi `ui/sidebar` shadcn (Vue), palet Indigo/Cyan, dan *progressive disclosure* yang sama.
+> 3. **Mindset Pragmatis & Minimal Diff (`ponytail`)**: Gunakan kembali komponen yang sudah ada di `resources/js/Components/` terlebih dahulu. Buat perubahan sesederhana mungkin tanpa menambahkan pustaka atau lapisan abstraksi yang tidak perlu.
 
 ---
 

@@ -1,7 +1,10 @@
 # Dokumentasi Koneksa Platform
 
-Mulai dari [AGENTS.md](../AGENTS.md) untuk workflow lintas agent.
-Dokumen di sini menjelaskan kontrak domain; aturan operasional tidak disalin per editor.
+Mulai dari [AGENTS.md](../AGENTS.md) untuk workflow lintas agent di semua perangkat developer.
+Setiap developer & AI coding agent wajib mematuhi **alur kerja 3-tahap**:
+1. **Aturan AI & Pragmatisme**: Baca `AGENTS.md` dan `.ai/rules/index.md`. Terapkan prinsip `ponytail` (solusi paling sederhana, anti-overengineering, minimalkan diff).
+2. **Dokumentasi Terkait**: Baca spesifikasi fitur di PRD dan rancangan data di ERD kanonis sebelum menulis kode.
+3. **Contoh UI Frontend**: Wajib merujuk ke [FRONTEND-UI-EXAMPLES.md](design-system/FRONTEND-UI-EXAMPLES.md) dan cetak biru konkret di [`docs/design-system/examples/`](design-system/examples/) setiap kali mengimplementasikan UI.
 
 | Kebutuhan | Acuan |
 |---|---|
@@ -11,7 +14,7 @@ Dokumen di sini menjelaskan kontrak domain; aturan operasional tidak disalin per
 | Pengarah skema dan pemeriksaan implementasi | [Skema](analysis/DATABASE-SCHEMA.md) |
 | Analisis/use case | [Analisis sistem](analysis/SYSTEM-ANALYST-GUIDELINES.md) |
 | Batas Inertia dan REST | [API](analysis/API-SPECIFICATION-GUIDE.md) |
-| UI dan token | [Baseline](design-system/BASELINE-DESIGN.md), [Tokens](design-system/DESIGN-TOKENS.md) |
+| UI, token, dan contoh konkret | [Baseline](design-system/BASELINE-DESIGN.md), [Tokens](design-system/DESIGN-TOKENS.md), [Contoh UI Frontend](design-system/FRONTEND-UI-EXAMPLES.md) di `docs/design-system/examples/` |
 | Status styling Vue / styled-components | [Styling](design-system/STYLED-COMPONENTS.md) |
 | Struktur fitur | [Pengembangan](guidelines/FEATURE-DEVELOPMENT-GUIDE.md), [Clean Code](guidelines/CLEAN-CODE.md) |
 | Verifikasi | [Testing](guidelines/AGENT-UNIT-TESTING.md) |
