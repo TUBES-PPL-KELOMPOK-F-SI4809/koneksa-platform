@@ -26,6 +26,12 @@ Sumber rancangan tunggal adalah [RANCANGAN_ERD_KONEKSA.md](RANCANGAN_ERD_KONEKSA
 
 Untuk tata cara pembuatan migrasi dan model baru, ikuti [panduan pengembangan fitur](../guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
 
+## Profil Usaha (`FR-04.1`, `KSA-15`)
+
+- `GET /business-profile` (`business-profile.edit`) menampilkan profil milik akun UMKM yang sedang login, daftar kategori, dan `identityLocked`. Nilai ini mengikuti pemeriksaan backend yang sudah ada: identitas terkunci jika profil tersebut pernah memiliki pengajuan verifikasi berstatus `approved`.
+- `PUT /business-profile` (`business-profile.update`) membuat atau memperbarui satu profil milik akun melalui `BusinessProfileService`, dengan validasi server dan penguncian dalam transaksi. Form hanya mengirim nama, kategori, deskripsi, alamat, kecamatan, kelurahan, serta telepon usaha.
+- UI mengunci nama, kategori, dan alamat sesuai `identityLocked`; pemeriksaan server tetap berlaku. Pengaturan publikasi/kebutuhan usaha berada pada FR terpisah. Tidak ada perubahan skema untuk pembaruan UI ini.
+
 ## 3. Kontrak Restock (`FR-06.1`, `KSA-20`)
 
 - `GET /umkm/inventory` (`umkm.inventory.index`) menampilkan stok varian aktif dan riwayat perubahan stok milik akun UMKM yang sedang login. Daftar stok dan riwayat dipaginasi terpisah melalui `stock_page` dan `history_page`; riwayat produk/varian yang diarsipkan tetap tersedia.

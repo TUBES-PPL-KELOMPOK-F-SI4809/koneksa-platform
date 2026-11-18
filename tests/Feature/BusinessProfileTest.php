@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class BusinessProfileTest extends TestCase
@@ -35,6 +36,9 @@ class BusinessProfileTest extends TestCase
 
         $this->assertDatabaseCount('businesses', 1);
         $this->assertDatabaseHas('businesses', ['user_id' => $owner->id, 'name' => 'Nama Baru']);
+        $this->get(route('business-profile.edit'))->assertInertia(fn (Assert $page) => $page
+            ->component('BusinessProfile/Edit')->where('identityLocked', false)
+            ->where('business.name', 'Nama Baru'));
         $this->actingAs($other)->get(route('business-profile.edit'))->assertOk()->assertDontSee('Nama Baru');
     }
 
@@ -45,7 +49,8 @@ class BusinessProfileTest extends TestCase
 
         $this->post(route('login'), ['email' => $user->email, 'password' => 'password'])
             ->assertRedirect(route('dashboard', absolute: false));
-        $this->get(route('business-profile.edit'))->assertOk();
+        $this->get(route('business-profile.edit'))->assertInertia(fn (Assert $page) => $page
+            ->component('BusinessProfile/Edit')->where('business', null)->where('identityLocked', false));
         $this->put(route('business-profile.update'), [
             'name' => 'Usaha Setelah Login',
             'business_category_id' => $category,
@@ -100,6 +105,11 @@ class BusinessProfileTest extends TestCase
         foreach (['approved', 'rejected'] as $status) {
             DB::table('verification_requests')->insert(['business_id' => $business, 'submitted_data' => '{}', 'status' => $status, 'created_at' => now(), 'updated_at' => now()]);
         }
+
+        $this->actingAs($user)->get(route('business-profile.edit'))->assertInertia(fn (Assert $page) => $page
+            ->component('BusinessProfile/Edit')->where('identityLocked', true));
+        $this->actingAs(User::factory()->umkm()->create())->get(route('business-profile.edit'))
+            ->assertInertia(fn (Assert $page) => $page->where('business', null)->where('identityLocked', false));
 
         $this->actingAs($user)->put(route('business-profile.update'), [
             'name' => 'Nama Baru', 'business_category_id' => $category, 'address' => 'Bandung',

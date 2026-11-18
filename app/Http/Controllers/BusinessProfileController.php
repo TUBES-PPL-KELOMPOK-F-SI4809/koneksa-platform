@@ -7,6 +7,7 @@ use App\Models\BusinessCategory;
 use App\Services\BusinessProfileService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,9 +15,13 @@ class BusinessProfileController extends Controller
 {
     public function edit(Request $request): Response
     {
+        $business = $request->user()->business;
+
         return Inertia::render('BusinessProfile/Edit', [
-            'business' => $request->user()->business,
+            'business' => $business,
             'categories' => BusinessCategory::query()->orderBy('name')->get(['id', 'name']),
+            'identityLocked' => $business !== null && DB::table('verification_requests')
+                ->where('business_id', $business->id)->where('status', 'approved')->exists(),
         ]);
     }
 
