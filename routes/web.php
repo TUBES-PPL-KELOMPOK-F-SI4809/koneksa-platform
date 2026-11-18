@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SupervisionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ProfileController;
@@ -96,6 +97,13 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/users/pemda', [UserManagementController::class, 'storePemda'])->name('users.pemda.store');
         Route::patch('/users/{user}/status', [UserManagementController::class, 'updateStatus'])->name('users.status');
         Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
+
+        // Panel Supervisi Entitas Sistem & Operasi Lintas Modul (KSA-148, KSA-149, KSA-150)
+        Route::get('/supervision', [SupervisionController::class, 'index'])->name('supervision.index');
+        Route::patch('/businesses/{business}/publication', [SupervisionController::class, 'toggleBusinessPublication'])
+            ->name('businesses.publication');
+        Route::post('/business-categories', [SupervisionController::class, 'storeCategory'])
+            ->name('categories.store');
     });
 
 require __DIR__.'/auth.php';
