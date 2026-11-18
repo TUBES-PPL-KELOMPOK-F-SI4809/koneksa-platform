@@ -43,6 +43,13 @@ const showingNavigationDropdown = ref(false);
                                     Profil Usaha
                                 </NavLink>
                                 <NavLink
+                                    v-if="$page.props.auth.user?.role === 'umkm'"
+                                    :href="route('umkm.inventory.index')"
+                                    :active="route().current('umkm.inventory.*')"
+                                >
+                                    Persediaan
+                                </NavLink>
+                                <NavLink
                                     v-if="$page.props.auth.user?.role === 'admin'"
                                     :href="route('admin.supervision.index')"
                                     :active="route().current('admin.supervision.index')"
@@ -185,6 +192,13 @@ const showingNavigationDropdown = ref(false);
                         </ResponsiveNavLink>
                         <ResponsiveNavLink v-if="$page.props.auth.user.role === 'umkm'" :href="route('business-profile.edit')" :active="route().current('business-profile.*')">
                             Profil Usaha
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="$page.props.auth.user?.role === 'umkm'"
+                            :href="route('umkm.inventory.index')"
+                            :active="route().current('umkm.inventory.*')"
+                        >
+                            Persediaan
                         </ResponsiveNavLink>
                     </div>
 
