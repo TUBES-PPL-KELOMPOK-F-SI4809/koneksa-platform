@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ProfileController;
+use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\PartnerProfile;
 use App\Models\User;
+use App\Services\AuditLogService;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -88,11 +91,22 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', fn () => Inertia::render('Admin/Dashboard'))->name('dashboard');
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
         Route::get('/users', fn () => response()->json(['users' => User::all()]))
             ->can('viewAny', User::class)
             ->name('users.index');
         Route::patch('/users/{user}/status', function (User $user, Request $request) {
-            $user->update(['account_status' => $request->input('account_status', User::STATUS_DISABLED)]);
+            $oldStatus = $user->account_status;
+            $newStatus = $request->input('account_status', User::STATUS_DISABLED);
+            $user->update(['account_status' => $newStatus]);
+
+            app(AuditLogService::class)->log(
+                AuditLog::MODULE_SUPERADMIN,
+                'user.status_toggled',
+                "Superadmin mengubah status akun pengguna {$user->name} dari {$oldStatus} ke {$newStatus}",
+                $user,
+                ['old_status' => $oldStatus, 'new_status' => $newStatus]
+            );
 
             return response()->json(['message' => 'Status akun pengguna diperbarui', 'user' => $user]);
         })->can('manageStatus', 'user')->name('users.status');
