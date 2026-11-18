@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\AuditLog;
+use App\Services\AuditLogService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,15 +31,24 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return Redirect::route('profile.edit');
+        app(AuditLogService::class)->log(
+            AuditLog::MODULE_USER,
+            'user.profile_updated',
+            "Pengguna {$user->name} memperbarui informasi profil akun",
+            $user,
+            ['updated_fields' => array_keys($request->validated())]
+        );
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
@@ -50,6 +61,13 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        app(AuditLogService::class)->log(
+            AuditLog::MODULE_USER,
+            'user.account_deleted',
+            "Pengguna {$user->name} menghapus akunnya sendiri",
+            $user
+        );
 
         Auth::logout();
 
