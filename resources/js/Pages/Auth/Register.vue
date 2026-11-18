@@ -69,7 +69,6 @@ const submit = () => {
                 >
                     <option value="umkm">Pelaku UMKM</option>
                     <option value="mitra">Mitra Industri</option>
-                    <option value="pemda">Pemerintah Daerah (Pemda)</option>
                 </select>
 
                 <InputError class="mt-2" :message="form.errors.role" />
