@@ -5,17 +5,18 @@ Dokumen di sini menjelaskan kontrak domain; aturan operasional tidak disalin per
 
 | Kebutuhan | Acuan |
 |---|---|
-| Lingkup 21 fitur / 42 FR | [PRD](PRD/PRD-KONEKSA-PLATFORM.md) |
+| Lingkup 32 fitur / 64 FR | [PRD](PRD/PRD-KONEKSA-PLATFORM.md) |
 | Spesifikasi fitur baru | [Template PRD](PRD/PRD-TEMPLATE.md) |
 | Rancangan data dan invariant kanonis | [ERD](analysis/RANCANGAN_ERD_KONEKSA.md) |
 | Pengarah skema dan pemeriksaan implementasi | [Skema](analysis/DATABASE-SCHEMA.md) |
 | Analisis/use case | [Analisis sistem](analysis/SYSTEM-ANALYST-GUIDELINES.md) |
 | Batas Inertia dan REST | [API](analysis/API-SPECIFICATION-GUIDE.md) |
-| UI dan token | [Baseline](design-system/BASELINE-DESIGN.md), [Tokens](design-system/DESIGN-TOKENS.md) |
+| UI, token, dan contoh konkret | [Baseline](design-system/BASELINE-DESIGN.md), [Tokens](design-system/DESIGN-TOKENS.md), [Contoh UI Frontend](design-system/FRONTEND-UI-EXAMPLES.md) |
 | Status styling Vue / styled-components | [Styling](design-system/STYLED-COMPONENTS.md) |
 | Struktur fitur | [Pengembangan](guidelines/FEATURE-DEVELOPMENT-GUIDE.md), [Clean Code](guidelines/CLEAN-CODE.md) |
 | Verifikasi | [Testing](guidelines/AGENT-UNIT-TESTING.md) |
 | Commit, push dan PR | [Git workflow](guidelines/GIT-WORKFLOW.md) |
+| Log Prompt AI Sprint 1 | [Log Prompt AI](guidelines/AI-PROMPT-LOG-SPRINT-1.md) |
 | Stack aktif dan keterbatasan | [Stack](tech-stack/CURRENT-STACK.md) |
 | Dependensi baru | [Prosedur stack](tech-stack/STACK-ADDITION-GUIDELINES.md) |
 
