@@ -8,7 +8,7 @@ Setiap developer & AI coding agent wajib mematuhi **alur kerja 3-tahap**:
 
 | Kebutuhan | Acuan |
 |---|---|
-| Lingkup 21 fitur / 42 FR | [PRD](PRD/PRD-KONEKSA-PLATFORM.md) |
+| Lingkup 32 fitur / 64 FR | [PRD](PRD/PRD-KONEKSA-PLATFORM.md) |
 | Spesifikasi fitur baru | [Template PRD](PRD/PRD-TEMPLATE.md) |
 | Rancangan data dan invariant kanonis | [ERD](analysis/RANCANGAN_ERD_KONEKSA.md) |
 | Pengarah skema dan pemeriksaan implementasi | [Skema](analysis/DATABASE-SCHEMA.md) |
@@ -19,6 +19,7 @@ Setiap developer & AI coding agent wajib mematuhi **alur kerja 3-tahap**:
 | Struktur fitur | [Pengembangan](guidelines/FEATURE-DEVELOPMENT-GUIDE.md), [Clean Code](guidelines/CLEAN-CODE.md) |
 | Verifikasi | [Testing](guidelines/AGENT-UNIT-TESTING.md) |
 | Commit, push dan PR | [Git workflow](guidelines/GIT-WORKFLOW.md) |
+| Log Prompt AI Sprint 1 | [Log Prompt AI](guidelines/AI-PROMPT-LOG-SPRINT-1.md) |
 | Stack aktif dan keterbatasan | [Stack](tech-stack/CURRENT-STACK.md) |
 | Dependensi baru | [Prosedur stack](tech-stack/STACK-ADDITION-GUIDELINES.md) |
 
