@@ -37,6 +37,7 @@ class PasswordController extends Controller
             "Pengguna {$user->name} memperbarui kata sandi akun",
             $user
         );
+
         return back()->with('status', 'password-updated');
     }
 }

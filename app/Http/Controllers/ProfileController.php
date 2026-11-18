@@ -48,6 +48,7 @@ class ProfileController extends Controller
             $user,
             ['updated_fields' => array_keys($request->validated())]
         );
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
