@@ -28,6 +28,7 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile information.
+     * Hanya field dasar tervalidasi yang diperbarui (FR-02.1).
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -47,7 +48,6 @@ class ProfileController extends Controller
             $user,
             ['updated_fields' => array_keys($request->validated())]
         );
-
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 

@@ -14,6 +14,8 @@ class PasswordController extends Controller
 {
     /**
      * Update the user's password.
+     * Memverifikasi password lama, melakukan hashing password baru,
+     * serta mereset flag must_change_password (FR-02.2, BR-01).
      */
     public function update(Request $request): RedirectResponse
     {
@@ -35,7 +37,6 @@ class PasswordController extends Controller
             "Pengguna {$user->name} memperbarui kata sandi akun",
             $user
         );
-
         return back()->with('status', 'password-updated');
     }
 }

@@ -1,112 +1,88 @@
-# 🎯 Spesifikasi Design Tokens — Koneksa Platform
+# Spesifikasi Design Tokens — Koneksa Platform (Modern Bento + shadcn/ui + Breeze Colorful)
 
-Dokumen ini adalah spesifikasi visual kanonis, bukan bukti seluruh token sudah tersedia sebagai CSS variable/objek runtime. Periksa resources/css/app.css dan tailwind.config.js sebelum memakai token; tambahkan mapping yang diperlukan dalam lingkup tugas. Jangan mengasumsikan ThemeProvider tersedia. Baseline proyek mengungguli preferensi estetika skills.
-
----
-
-## 1. Token Warna (Color Tokens)
-
-### 1.1 Brand Primary (Indigo)
-* `color.primary.50`: `#EEF2FF`
-* `color.primary.100`: `#E0E7FF`
-* `color.primary.200`: `#C7D2FE`
-* `color.primary.300`: `#A5B4FC`
-* `color.primary.400`: `#818CF8`
-* `color.primary.500`: `#6366F1`
-* `color.primary.600` *(Base Primary)*: `#4F46E5`
-* `color.primary.700`: `#4338CA`
-* `color.primary.800`: `#3730A3`
-* `color.primary.900`: `#312E81`
-
-### 1.2 Brand Secondary / Accent (Cyan / Sky)
-* `color.secondary.50`: `#ECFEFF`
-* `color.secondary.100`: `#CFFAFE`
-* `color.secondary.500` *(Base Accent)*: `#06B6D4`
-* `color.secondary.600`: `#0891B2`
-* `color.secondary.700`: `#0E7490`
-
-### 1.3 Neutrals & Greys (Slate)
-* `color.neutral.50`: `#F8FAFC` *(Kanvas background terang)*
-* `color.neutral.100`: `#F1F5F9` *(Surface card / muted container)*
-* `color.neutral.200`: `#E2E8F0` *(Border & divider)*
-* `color.neutral.300`: `#CBD5E1`
-* `color.neutral.400`: `#94A3B8` *(Placeholder teks)*
-* `color.neutral.500`: `#64748B` *(Teks sekunder / muted)*
-* `color.neutral.700`: `#334155` *(Teks label)*
-* `color.neutral.800`: `#1E293B` *(Card dark / teks kontras)*
-* `color.neutral.900`: `#0F172A` *(Heading utama / background dark)*
-
-### 1.4 Semantic Feedback
-* **Success**:
-  * Light: `#ECFDF5`
-  * Base: `#10B981` (Emerald)
-  * Dark: `#047857`
-* **Warning**:
-  * Light: `#FFFBEB`
-  * Base: `#F59E0B` (Amber)
-  * Dark: `#B45309`
-* **Danger**:
-  * Light: `#FEF2F2`
-  * Base: `#EF4444` (Rose/Red)
-  * Dark: `#B91C1C`
-* **Info**:
-  * Light: `#EFF6FF`
-  * Base: `#3B82F6` (Blue)
-  * Dark: `#1D4ED8`
+Dokumen ini adalah spesifikasi visual kanonis untuk seluruh developer dan AI coding agent.
+Periksa `resources/css/app.css` dan `tailwind.config.js` sebelum memakai token, dan rujuk konfigurasi referensi siap pakai di [`examples/tailwind.config.js`](examples/tailwind.config.js) serta [`examples/css/app.css`](examples/css/app.css) (lihat [FRONTEND-UI-EXAMPLES.md](FRONTEND-UI-EXAMPLES.md)).
 
 ---
 
-## 2. Token Tipografi (Typography Tokens)
+## 1. Token Warna (Indigo & Cyan pada Kanvas Bento Lembut)
+
+### 1.1 Permukaan & Netral (Soft Slate Canvas)
+* `color.surface.white`: `#FFFFFF` *(Kartu bento utama, sidebar, header, modal)*
+* `color.surface.canvas` (`neutral.50`): `#F4F6F9` *(Kanvas background aplikasi yang lembut)*
+* `color.surface.muted` (`neutral.100`): `#F1F5F9` *(Permukaan sekunder, kotak detail yang di-extend, pill input)*
+* `color.border.hairline` (`neutral.200`): `#E2E8F0` *(Border 1px kartu, divider, tabel, input)*
+* `color.border.strong` (`neutral.300`): `#CBD5E1` *(Border hover, outline tombol sekunder)*
+* `color.text.placeholder` (`neutral.400`): `#94A3B8` *(Placeholder input, ikon nonaktif)*
+* `color.text.muted` (`neutral.500`): `#64748B` *(Sub-label perbandingan, timestamp, shortcut hint)*
+* `color.text.secondary` (`neutral.600`): `#475569` *(Label kartu KPI, deskripsi sekunder, navigasi)*
+* `color.text.label` (`neutral.700`): `#334155` *(Label form, sub-heading)*
+* `color.ink.900` (`ink.DEFAULT`): `#0F172A` *(Heading utama, angka KPI, teks kontras tinggi)*
+* `color.ink.950` (`ink.deep`): `#020617` *(Top bar evaluasi)*
+
+### 1.2 Primary Brand & Aksi Utama (Indigo)
+* `primary.50`: `#EEF2FF` *(Background pill aktif sekunder, highlight lembut)*
+* `primary.100`: `#E0E7FF` *(Border pill aktif)*
+* `primary.200`: `#C7D2FE`
+* `primary.500`: `#6366F1` *(Focus ring input/button, hover tombol utama)*
+* `primary.600`: `#4F46E5` *(Item aktif sidebar, `PrimaryButton`, batang grafik utama)*
+* `primary.700`: `#4338CA` *(Teks badge primary, active state tombol)*
+
+### 1.3 Secondary & Role Accents (Cyan & Ekosistem)
+* `secondary.50`: `#ECFEFF` *(Highlight lembut Mitra/Kemitraan)*
+* `secondary.100`: `#CFFAFE`
+* `secondary.500`: `#06B6D4` *(Aksen Cyan Koneksa, grafik sekunder)*
+* `secondary.600`: `#0891B2` *(Identitas role Mitra Industri)*
+* `secondary.700`: `#0E7490`
+* `accent.500`: `#0070F3` *(Status info & link interaktif)*
+
+### 1.4 Semantic Feedback (Pill Trend & Status)
+* **Success (Naik / Aman / Terverifikasi)**:
+  * Light: `#ECFDF5` | Base: `#10B981` | Dark: `#047857`
+* **Warning (Menipis / Menunggu Review)**:
+  * Light: `#FFFBEB` | Base: `#F59E0B` | Dark: `#B45309`
+* **Danger (Turun / Habis / Ditolak)**:
+  * Light: `#FFF1F2` | Base: `#E11D48` | Dark: `#BE123C`
+* **Info (Baru / Sistem)**:
+  * Light: `#EFF6FF` | Base: `#0070F3` | Dark: `#1D4ED8`
+
+### 1.5 Sidebar Tokens (`resources/css/app.css`)
+* `--sidebar`: `#FFFFFF`
+* `--sidebar-foreground`: `#0F172A`
+* `--sidebar-primary`: `#4F46E5`
+* `--sidebar-primary-foreground`: `#FFFFFF`
+* `--sidebar-accent`: `#EEF2FF`
+* `--sidebar-accent-foreground`: `#4338CA`
+* `--sidebar-border`: `#E2E8F0`
+* `--sidebar-ring`: `#6366F1`
+
+---
+
+## 2. Token Tipografi
 
 * **Font Family**:
-  * `font.sans`: `'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
-  * `font.mono`: `'JetBrains Mono', 'Fira Code', monospace`
+  * `font.sans`: `'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
+  * `font.mono`: `'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, monospace`
 
-* **Ukuran Font & Line Height**:
-  | Token | Font Size | Line Height | Tracking | Penggunaan |
-  | :--- | :--- | :--- | :--- | :--- |
-  | `text.xs` | `0.75rem (12px)` | `1rem (16px)` | `0.025em` | Badges, metadata, timestamp |
-  | `text.sm` | `0.875rem (14px)` | `1.25rem (20px)` | `0` | Form labels, table cells, secondary text |
-  | `text.base` | `1rem (16px)` | `1.5rem (24px)` | `0` | Body paragraph, default inputs |
-  | `text.lg` | `1.125rem (18px)` | `1.75rem (28px)` | `-0.01em` | Subheadings, card titles |
-  | `text.xl` | `1.25rem (20px)` | `1.75rem (28px)` | `-0.015em` | Modal titles, Section headers (H3) |
-  | `text.2xl` | `1.5rem (24px)` | `2rem (32px)` | `-0.02em` | Page section titles (H2) |
-  | `text.3xl` | `1.875rem (30px)` | `2.25rem (36px)` | `-0.025em` | Main page titles (H1) |
-  | `text.4xl` | `2.25rem (36px)` | `2.5rem (40px)` | `-0.03em` | Hero displays |
+* **Skala Ukuran Font**:
+  | Token | Ukuran | Penggunaan |
+  | :--- | :--- | :--- |
+  | `text.xs` (`12px`) | `0.75rem` | Pill status, perbandingan bulan lalu, header tabel |
+  | `text.sm` (`14px`) | `0.875rem` | Menu sidebar, tombol, sel tabel utama |
+  | `text.base` (`16px`) | `1rem` | Judul kartu bento, deskripsi utama |
+  | `text.xl` (`20px`) | `1.25rem` | Judul halaman panel (`Sales Overview` style) |
+  | `text.2xl` (`24px`) | `1.5rem` | Angka KPI utama pada `StatCard` |
 
 ---
 
-## 3. Token Elevasi & Bayangan (Shadows & Elevation)
+## 3. Token Elevasi, Border & Radius (Bento Style)
 
-* `elevation.none`: `none`
-* `elevation.sm`: `0 1px 2px 0 rgb(0 0 0 / 0.05)` (Input fields, subtle cards)
-* `elevation.base`: `0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`
-* `elevation.md`: `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)` (Cards hover, dropdowns)
-* `elevation.lg`: `0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)` (Popovers, floating bars)
-* `elevation.xl`: `0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)` (Modals, dialogs)
-
----
-
-## 4. Token Radius Sudut (Border Radius)
-
-* `radius.none`: `0px`
-* `radius.sm`: `4px` (Tags, chips kecil)
-* `radius.md`: `8px` (Inputs, tombol standar)
-* `radius.lg`: `12px` (Cards, panels)
-* `radius.xl`: `16px` (Modals, banners)
-* `radius.full`: `9999px` (Avatars, pills, circular icon buttons)
-
----
-
-## 5. Token Z-Index (Layering Hierarchy)
-
-* `z.hide`: `-1`
-* `z.base`: `0`
-* `z.docked`: `10` (Sticky elements)
-* `z.dropdown`: `1000` (Dropdown menus, autocomplete)
-* `z.sticky`: `1100` (Sticky navbar)
-* `z.overlay`: `1200` (Modal backdrop)
-* `z.modal`: `1300` (Modal dialog)
-* `z.toast`: `1400` (Notification toasts, alerts)
-* `z.tooltip`: `1500` (Tooltips)
-
+* **Border Default**: `1px solid #E2E8F0` (`border-hairline`).
+* **Elevasi**:
+  * `shadow-xs`: `0 1px 3px 0 rgb(15 23 42 / 0.04)` (kartu bento, tombol, pill header)
+  * `shadow-paas`: `0 6px 16px -4px rgb(15 23 42 / 0.07)` (hover card, popover, modal)
+* **Radius Sudut**:
+  * `rounded-lg` (`8px`): Input form, kotak rincian dalam kartu
+  * `rounded-xl` (`12px`): Item menu sidebar aktif, tombol aksi, baris item
+  * `rounded-2xl` (`16px`): Kartu KPI (`StatCard`), kartu grafik, kontainer tabel utama
+  * `rounded-full` (`9999px`): Input pencarian topbar, filter periode, pill persentase KPI, avatar
