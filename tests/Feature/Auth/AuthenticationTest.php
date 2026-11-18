@@ -19,7 +19,9 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'account_status' => User::STATUS_ENABLED,
+        ]);
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -34,12 +36,35 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
         $this->assertGuest();
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function test_disabled_user_cannot_authenticate(): void
+    {
+        $user = User::factory()->disabled()->create();
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertGuest();
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function test_unauthenticated_user_cannot_access_protected_routes(): void
+    {
+        $responseDashboard = $this->get('/dashboard');
+        $responseDashboard->assertRedirect(route('login'));
+
+        $responseProfile = $this->get('/profile');
+        $responseProfile->assertRedirect(route('login'));
     }
 
     public function test_users_can_logout(): void
@@ -50,5 +75,24 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
         $response->assertRedirect('/');
+    }
+
+    public function test_login_rate_limiting_throttle_locks_out_after_too_many_attempts(): void
+    {
+        $user = User::factory()->create();
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post('/login', [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+        }
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertSessionHasErrors('email');
     }
 }
