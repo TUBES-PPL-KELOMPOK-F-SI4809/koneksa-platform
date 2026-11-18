@@ -1,45 +1,72 @@
 # Rancangan ERD KONEKSA
 
-Ruang lingkup: FR-01–FR-21, Laravel 13, MySQL 8. Berdasarkan proposal dan konfirmasi pemilik rancangan. Ini adalah acuan rancangan data kanonis; sebagian struktur sudah diwujudkan dalam database/migrations/. Periksa migrasi, kode dan test untuk status implementasi aktual. Rancangan ini tidak menyatakan semua invariant sudah ditegakkan aplikasi.
+Ruang lingkup: **FR-01–FR-32 (32 Kelompok Fitur / 64 Functional Requirements)** sesuai Proposal PPL terbaru (revisi 13 November 2026) dan backlog Jira (`KSA`), menggunakan Laravel 13 dan MySQL 8.
 
-## 1. Keputusan rancangan
+Dokumen ini adalah acuan rancangan data kanonis proyek KONEKSA. Sebagian besar struktur dasar (**18 tabel baseline FR-01–FR-21**) sudah diwujudkan dalam `database/migrations/`. Perluasan untuk **FR-22–FR-32** dirancang menggunakan prinsip *minimum additive schema* (migrasi baru tanpa mengubah migrasi lama). Selalu periksa migrasi, kode, dan test untuk memastikan status implementasi aktual.
 
-Ketentuan terkonfirmasi:
+---
 
-- Satu akun hanya satu peran, tidak dapat berubah peran. Satu akun UMKM memiliki satu usaha; satu akun Mitra memiliki satu organisasi. Profil dapat belum dibuat pada saat registrasi.
-- Registrasi UMKM/Mitra harus memverifikasi email sebelum mengakses fitur bisnis. Status administratif akun terpisah dari verifikasi email dan verifikasi usaha.
-- Satu admin dibuat developer. Akun pemerintah dibuat admin, dengan password acak yang di-hash dan wajib diganti. Pemerintah tidak membutuhkan profil instansi/jabatan.
-- Satu sesi login per akun. Nonaktivasi mencabut seluruh sesi.
-- Produk mendukung ukuran/warna; riwayat restock disimpan. Penjualan dapat diedit/dibatalkan.
-- Satu usaha dapat mengikuti banyak program; kuota menghitung peserta diterima. Semua petugas pemerintah dapat mengelola seluruh program.
-- Pengajuan verifikasi dapat diulang. Catatan keputusan verifikasi disimpan, tanpa tabel audit tindakan admin.
+## 1. Keputusan Rancangan & Hasil Audit Arsitektur
 
-Pilihan desain yang diusulkan, bukan fakta tambahan dari proposal:
+### 1.1 Ketentuan Terkonfirmasi (Fakta Proposal & Kontrak Sistem)
+- **Empat Role Pengguna Tetap**: Satu akun hanya memiliki satu peran (`role`) yang bersifat *immutable* setelah dibuat. Nilai kanonis di database mengikuti migrasi aktif dan seeder:
+  - `'umkm'` — Pelaku UMKM (1 akun mengelola maksimal 1 profil usaha pada `businesses`).
+  - `'mitra'` — Mitra Industri (1 akun mengelola maksimal 1 profil organisasi pada `partner_profiles`).
+  - `'pemda'` — Petugas Pemerintah Daerah (akun dibuat oleh Superadmin, tidak memerlukan tabel profil terpisah).
+  - `'admin'` — Superadmin / Admin Platform (pengelola teknis tertinggi untuk manajemen pengguna, provisioning akun Pemda, tindakan administratif lintas role, dan pengawasan audit trail).
+- **Registrasi & Onboarding (`FR-01.1`, `KSA-10`)**:
+  - Formulir registrasi publik (`/register`) **hanya** mengizinkan pilihan role `'umkm'` dan `'mitra'`. Pembuatan akun `'pemda'` atau `'admin'` lewat jalur publik dilarang keras.
+  - Untuk menjaga isolasi modul antar-anggota tim, registrasi akun dapat langsung membuat entitas `users` terlebih dahulu (kardinalitas `0..1` ke `businesses`/`partner_profiles`), lalu pengguna menyelesaikan pengisian identitas awal usaha/organisasi pada alur onboarding profil (`FR-04.1` / `FR-16.1`), atau dibuat dalam satu transaksi apabila field wajib profil disertakan.
+- **Autentikasi, Sesi Tunggal & Status Akun (`FR-01.2`, `FR-03`, `KSA-11`, `KSA-38`)**:
+  - Status administratif akun disimpan pada `users.account_status` (`'enabled'` / `'disabled'`), terpisah dari verifikasi email (`email_verified_at`) dan verifikasi administratif usaha (`verification_requests`).
+  - Satu sesi login aktif per akun ditegakkan melalui `users.current_session_id`. Login baru menggantikan sesi lama.
+  - Nonaktivasi akun (`disabled`), penghapusan akun (*soft delete*), atau reset password wajib mencabut seluruh sesi pengguna di tabel `sessions` dan mengosongkan `current_session_id`.
+  - Akun petugas `'pemda'` dibuat oleh `'admin'` dengan `must_change_password = true` dan wajib mengganti password sebelum mengakses fitur operasional.
+- **Operasional UMKM (`FR-05`–`FR-09`)**:
+  - Produk mendukung varian ukuran/warna (`product_variants`); perubahan stok wajib tercatat secara atomik bersama ledger `stock_movements` (`BR-02`).
+  - Produk yang diarsipkan (`archived_at != null`) tidak dapat dipakai pada transaksi baru, tetapi riwayat transaksi tetap utuh (`BR-03`).
+- **Direktori, Publikasi Performa & Kolaborasi (`FR-10`–`FR-12`, `FR-16`–`FR-18`, `FR-22`–`FR-25`, `FR-30`)**:
+  - Informasi performa UMKM hanya ditampilkan pada profil publik sesuai pengaturan izin publikasi pemilik usaha (`BR-04`).
+  - Proposal kolaborasi (`collaboration_proposals`) dapat diinisiasi oleh UMKM maupun Mitra Industri, dan hanya dapat direspons (`accepted`/`rejected`) oleh pihak penerima (`BR-05`).
+  - Kemitraan berjalan (`ongoing`) dan selesai (`completed`) dilanjutkan dari proposal yang `accepted` (`BR-06`), mencakup pencatatan ringkasan kesepakatan (`FR-24`), pembaruan progres berkala (`FR-25`), serta laporan hasil kolaborasi (`FR-30`).
+- **Program Pemerintah, Seleksi & Undangan VIP (`FR-13`–`FR-15`, `FR-26`–`FR-27`)**:
+  - Program/event pemerintah dapat ditujukan kepada UMKM, Mitra Industri, atau keduanya melalui mekanisme pendaftaran umum maupun undangan khusus/VIP (`BR-08`).
+  - Satu organisasi tidak boleh memiliki pendaftaran ganda pada kegiatan yang sama (`BR-09`), dan jumlah peserta diterima/terkonfirmasi (termasuk undangan VIP) tidak boleh melebihi kuota (`BR-10`, `BR-11`).
+- **Verifikasi Administratif, Mediasi & Monitoring Pemda (`FR-19`–`FR-21`, `FR-28`–`FR-29`)**:
+  - Verifikasi UMKM (`verification_requests`) merupakan pemeriksaan administratif oleh petugas `'pemda'` (`BR-12`).
+  - Pihak yang terlibat dalam kemitraan dapat mengajukan permintaan fasilitasi/mediasi (`mediation_requests`) yang ditindaklanjuti oleh `'pemda'` (`BR-14`).
+- **Superadmin & Audit Trail (`FR-31`–`FR-32`, `BR-15`, `NFR-08`)**:
+  - Setiap tindakan administratif penting oleh Superadmin, perubahan status akun, pembuatan akun Pemda, keputusan verifikasi UMKM, keputusan seleksi peserta program, serta perubahan status kemitraan wajib dicatat secara *append-only* pada tabel **`audit_logs`** dengan identitas pelaksana (`actor_id`), waktu, modul, dan jenis aktivitas.
 
-- Penghapusan akun memakai soft delete: akses ditutup dan sesi dicabut, sementara data transaksi, proposal, serta keputusan tetap memiliki relasi. Akun baru memakai ID baru dan tidak mewarisi usaha/data akun lama. Ini penghapusan operasional, bukan pemusnahan data pribadi; kebijakan retensi perlu ditetapkan sebelum produksi. Email akun tersimpan tetap unik, termasuk akun terhapus; bila perlu memakai email lama, diperlukan kebijakan pelepasan/anonymisasi email terlebih dahulu.
-- Login baru menggantikan sesi perangkat sebelumnya. Tidak memakai fitur remember-me pada MVP agar aturan satu sesi tetap sederhana.
-- Satu usaha hanya boleh memiliki satu pendaftaran per program. Banyak program tetap diperbolehkan.
-- Semua produk memiliki minimal satu varian. Produk tanpa ukuran/warna memakai varian `default`; stok dan harga berada pada varian, bukan disalin ke produk.
-- Ukuran dan warna berupa teks. Belum membutuhkan tabel atribut generik, multi-gudang, diskon, pajak, atau pembayaran.
-- Kuantitas stok adalah bilangan bulat. Jika kebutuhan berubah menjadi berat/volume pecahan, evaluasi quantity seluruh tabel terkait secara konsisten dan ubah melalui migrasi baru; jangan mengedit migrasi lama.
-- Proposal menghubungkan tepat satu usaha dan satu Mitra; dapat diajukan salah satu pihak. Minat UMKM pada penawaran digital disimpan sebagai proposal yang merujuk penawaran tersebut. Penerima yang memutuskan.
-- Pengajuan verifikasi menyimpan snapshot identitas usaha dan lampiran opsional, tanpa mewajibkan NIB. Pemerintah memberikan keputusan administratif, bukan sertifikasi legal.
+### 1.2 Pilihan Desain Best Practice (Reuse & Anti-Overengineering)
+- **Tanpa Tabel RBAC Kompleks**: Tidak menggunakan tabel `roles`, `permissions`, atau `model_has_roles`. Empat role tetap (`umkm`, `mitra`, `pemda`, `admin`) ditegakkan melalui kolom `users.role`, middleware `CheckRole`, dan Laravel Policies/Gates.
+- **Soft Delete pada `users`**: Penghapusan akun menggunakan *soft delete* (`deleted_at`) agar FK historis (`RESTRICT`) pada transaksi, pergerakan stok, proposal, verifikasi, dan audit log tidak rusak.
+- **Strategi Migrasi Aditif untuk FR-22–FR-32**:
+  - **Sudah ada di `database/migrations/` (18 tabel)**: `users`, `password_reset_tokens`, `sessions`, `business_categories`, `cooperation_types`, `businesses`, `partner_profiles`, `partner_cooperation_types`, `products`, `product_variants`, `sales`, `sale_items`, `stock_movements`, `digital_offerings`, `collaboration_proposals`, `programs`, `program_applications`, `verification_requests`.
+  - **Migrasi Baru yang Direkomendasikan (3 tabel baru + kolom aditif)**:
+    1. Tabel `audit_logs` (`FR-31`, `FR-32` — Sprint 1 `KSA-152`).
+    2. Tabel `collaboration_updates` + kolom kesepakatan/hasil pada `collaboration_proposals` (`FR-24`, `FR-25`, `FR-30`).
+    3. Tabel `mediation_requests` (`FR-28`).
+    4. Kolom aditif visibilitas performa pada `businesses` (`FR-22`) serta dukungan partisipasi Mitra & undangan VIP pada `programs` dan `program_applications` (`FR-14`, `FR-26`, `FR-27`).
 
-## 2. Konvensi
+---
 
-- PK domain: BIGINT UNSIGNED auto increment; FK memakai tipe identik.
-- Seluruh tabel domain memiliki `created_at` dan `updated_at`, kecuali stock_movements yang cukup memiliki `created_at` karena immutable.
-- Uang memakai DECIMAL(15,2), bukan FLOAT. Waktu disimpan konsisten dalam UTC dan ditampilkan WIB.
-- `?` pada uraian berarti nullable. Diagram menampilkan atribut inti; aturan lengkap ada pada bagian constraints.
-- `||` = tepat satu; `o|` = nol atau satu; `o{` = nol atau banyak.
+## 2. Konvensi Skema
+- **Primary Key (PK)**: `BIGINT UNSIGNED` auto-increment; Foreign Key (FK) menggunakan tipe identik.
+- **Timestamps**: Seluruh tabel domain menggunakan `created_at` dan `updated_at`, kecuali tabel ledger/log yang bersifat *immutable* (`stock_movements` dan `audit_logs`) yang hanya menggunakan `created_at`.
+- **Nilai Uang & Waktu**: Uang menggunakan `DECIMAL(15,2)`. Waktu disimpan dalam UTC dan ditampilkan dalam zona waktu aplikasi (`Asia/Jakarta` / WIB).
+- **Notasi Kardinalitas**: `||` = tepat satu; `o|` = nol atau satu; `o{` = nol atau banyak; `|{` = satu atau banyak. Tanda `*` pada penjelasan kolom menandakan kolom perluasan aditif untuk FR-22–FR-32.
 
-## 3. Diagram keseluruhan
+---
+
+## 3. Diagram Keseluruhan (ERD Kanonis FR-01–FR-32)
 
 ```mermaid
 erDiagram
     USERS ||--o| BUSINESSES : owns
     USERS ||--o| PARTNER_PROFILES : owns
     USERS o|--o{ SESSIONS : authenticates
+    USERS o|--o{ AUDIT_LOGS : performs
     BUSINESS_CATEGORIES ||--o{ BUSINESSES : classifies
     BUSINESSES ||--o{ PRODUCTS : owns
     PRODUCTS ||--|{ PRODUCT_VARIANTS : has
@@ -57,10 +84,16 @@ erDiagram
     COOPERATION_TYPES ||--o{ COLLABORATION_PROPOSALS : classifies
     DIGITAL_OFFERINGS o|--o{ COLLABORATION_PROPOSALS : referenced_by
     USERS ||--o{ COLLABORATION_PROPOSALS : initiates
+    COLLABORATION_PROPOSALS ||--o{ COLLABORATION_UPDATES : tracks
+    USERS ||--o{ COLLABORATION_UPDATES : posts
+    COLLABORATION_PROPOSALS ||--o{ MEDIATION_REQUESTS : escalates
+    USERS ||--o{ MEDIATION_REQUESTS : requests
+    USERS o|--o{ MEDIATION_REQUESTS : handles
     USERS ||--o{ PROGRAMS : creates
     PROGRAMS ||--o{ PROGRAM_APPLICATIONS : receives
-    BUSINESSES ||--o{ PROGRAM_APPLICATIONS : submits
-    USERS o|--o{ PROGRAM_APPLICATIONS : reviews
+    BUSINESSES o|--o{ PROGRAM_APPLICATIONS : submits
+    PARTNER_PROFILES o|--o{ PROGRAM_APPLICATIONS : submits
+    USERS o|--o{ PROGRAM_APPLICATIONS : reviews_or_invites
     BUSINESSES ||--o{ VERIFICATION_REQUESTS : submits
     USERS o|--o{ VERIFICATION_REQUESTS : reviews
 
@@ -68,11 +101,11 @@ erDiagram
         bigint id PK
         string name
         string email UK
+        string role "umkm|mitra|pemda|admin"
+        string account_status "enabled|disabled"
         string password
         string phone
         string avatar_path
-        string role
-        string account_status
         datetime email_verified_at
         boolean must_change_password
         string current_session_id
@@ -91,6 +124,19 @@ erDiagram
         string token
         datetime created_at
     }
+    AUDIT_LOGS {
+        bigint id PK
+        bigint actor_id FK
+        string actor_role
+        string module
+        string action
+        string auditable_type
+        bigint auditable_id
+        string description
+        json metadata
+        string ip_address
+        datetime created_at
+    }
     BUSINESS_CATEGORIES {
         bigint id PK
         string name UK
@@ -107,6 +153,7 @@ erDiagram
         string contact_phone
         string logo_path
         text business_needs
+        json public_performance_config
         datetime published_at
     }
     PARTNER_PROFILES {
@@ -200,14 +247,40 @@ erDiagram
         string status
         text response_note
         datetime responded_at
+        text agreement_summary
+        text target_goals
+        date period_start
+        date period_end
+        text result_summary
         datetime started_at
         datetime completed_at
+    }
+    COLLABORATION_UPDATES {
+        bigint id PK
+        bigint collaboration_proposal_id FK
+        bigint created_by FK
+        string activity_title
+        text progress_note
+        int progress_percentage
+        string attachment_path
+        datetime created_at
+    }
+    MEDIATION_REQUESTS {
+        bigint id PK
+        bigint collaboration_proposal_id FK
+        bigint requested_by FK
+        text issue_description
+        string status
+        bigint handled_by FK
+        text follow_up_note
+        datetime resolved_at
     }
     PROGRAMS {
         bigint id PK
         bigint created_by FK
         string title
         text description
+        string target_participant
         text requirements
         string location
         int quota
@@ -221,6 +294,9 @@ erDiagram
         bigint id PK
         bigint program_id FK
         bigint business_id FK
+        bigint partner_profile_id FK
+        string entry_type
+        bigint invited_by FK
         text application_note
         string attachment_path
         string status
@@ -240,142 +316,151 @@ erDiagram
     }
 ```
 
-Password reset memakai email sebagai key bawaan infrastruktur Laravel; tidak digambar sebagai FK domain ke users. SESSIONS adalah tabel infrastruktur; user_id nullable untuk sesi tamu. current_session_id merupakan penanda sesi sah, bukan FK balik yang menciptakan ketergantungan melingkar.
+---
 
-## 4. Detail bagian FR-01–03
+## 4. Spesifikasi Detail Tabel Inti: Autentikasi, Superadmin & Audit (`FR-01`–`FR-03`, `FR-31`–`FR-32`)
 
-### users
+### 4.1 `users` (Sudah Dimigrasikan)
 
-| Kolom | Tipe | Ketentuan |
+| Kolom | Tipe | Ketentuan & Invariant |
 |---|---|---|
-| id | BIGINT UNSIGNED | PK |
-| name | VARCHAR(150) | Wajib |
-| email | VARCHAR(255) | Wajib, unik; normalisasi huruf kecil |
-| password | VARCHAR(255) | Hash, tidak pernah plaintext |
-| phone | VARCHAR(30) | Nullable; teks agar awalan 0/+ terjaga |
-| avatar_path | VARCHAR(255) | Nullable; path storage |
-| role | VARCHAR(20) | umkm, partner, government, admin; immutable |
-| account_status | VARCHAR(20) | enabled, disabled; default enabled |
-| email_verified_at | TIMESTAMP | Nullable sampai email terverifikasi |
-| must_change_password | BOOLEAN | Default false; true untuk pemerintah baru |
-| current_session_id | VARCHAR(255) | Nullable; jangan diekspos pada respons profil |
-| created_at, updated_at | TIMESTAMP | Timestamp Laravel |
-| deleted_at | TIMESTAMP | Nullable; soft delete |
+| `id` | `BIGINT UNSIGNED` | PK |
+| `name` | `VARCHAR(255)` | Wajib |
+| `email` | `VARCHAR(255)` | Wajib, unik (`UNIQUE`), dinormalisasi huruf kecil (`lowercase`) |
+| `role` | `ENUM('umkm','mitra','pemda','admin')` | Default `'umkm'`; *immutable*. Publik hanya boleh daftar `'umkm'` atau `'mitra'` |
+| `account_status` | `VARCHAR(20)` | `'enabled'` atau `'disabled'`; default `'enabled'` |
+| `password` | `VARCHAR(255)` | Hash Bcrypt/Argon2; tidak pernah disimpan plaintext |
+| `phone` | `VARCHAR(30)` | Nullable; disimpan sebagai string agar awalan `0`/`+62` terjaga |
+| `avatar_path` | `VARCHAR(255)` | Nullable; path storage |
+| `email_verified_at` | `TIMESTAMP` | Nullable sampai email terverifikasi |
+| `must_change_password` | `BOOLEAN` | Default `false`; diset `true` saat Superadmin membuat akun `'pemda'` baru |
+| `current_session_id` | `VARCHAR(255)` | Nullable; penanda ID sesi aktif tunggal (disembunyikan pada serialisasi model `#[Hidden]`) |
+| `remember_token` | `VARCHAR(100)` | Nullable; bawaan infrastruktur Laravel |
+| `created_at`, `updated_at` | `TIMESTAMP` | Timestamp standar Laravel |
+| `deleted_at` | `TIMESTAMP` | Nullable; *soft delete* (`SoftDeletes`) |
 
-Hak akses fitur bisnis mensyaratkan akun enabled, belum terhapus, email terverifikasi, password sementara sudah diganti, dan sesi cocok current_session_id. Akun belum verifikasi masih boleh masuk ke alur terbatas verifikasi email/logout; pemerintah berpassword sementara hanya boleh mengakses alur terbatas yang diperlukan untuk mengganti password dan verifikasi.
+**Aturan Akses & Keamanan Akun**:
+1. Request ke fitur terautentikasi mensyaratkan `account_status === 'enabled'` dan `deleted_at === null`.
+2. Jika `must_change_password === true`, pengguna hanya diizinkan mengakses halaman profil/ganti password dan logout sampai password diperbarui.
+3. Superadmin (`role === 'admin'`) tidak boleh menonaktifkan atau menghapus akunnya sendiri melalui panel manajemen pengguna.
 
-Pemerintah juga memverifikasi email. Admin awal diverifikasi melalui proses bootstrap developer yang dipercaya. Pembuatan admin kedua dilarang. Satu admin merupakan invariant aplikasi dan dapat diperkuat MySQL menggunakan generated column nullable yang bernilai 1 hanya untuk role admin dengan UNIQUE index; jangan memakai UNIQUE(role) karena peran lain harus dapat dimiliki banyak akun. Admin awal tidak dapat dihapus/nonaktif melalui UI biasa.
+### 4.2 `sessions` dan `password_reset_tokens` (Sudah Dimigrasikan)
+- Menggunakan skema driver sesi database bawaan Laravel (`INDEX(user_id)`, `INDEX(last_activity)`).
+- Saat login berhasil: perbarui `current_session_id` dengan ID sesi yang baru diregenerasi dan bersihkan sesi lama milik `user_id` tersebut di tabel `sessions`.
+- Saat logout, nonaktivasi akun oleh Superadmin, atau *soft delete* akun: hapus baris sesi terkait di `sessions` dan kosongkan `current_session_id = null`.
 
-Tidak dibutuhkan roles, permissions, model_has_roles, atau profil pemerintah: empat peran tetap dapat diwakili satu kolom role dan Laravel Policies/Gates. Tambahkan tabel izin hanya bila kebutuhan berubah.
+### 4.3 `audit_logs` (Migrasi Baru — `KSA-152` / `FR-31.2` / `FR-32.1` / `FR-32.2` / `BR-15`)
 
-### sessions dan password_reset_tokens
+| Kolom | Tipe | Ketentuan & Invariant |
+|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK |
+| `actor_id` | `BIGINT UNSIGNED` | Nullable, FK ke `users(id)` (`nullOnDelete()`); identitas pengguna pelaksana aksi |
+| `actor_role` | `VARCHAR(20)` | Nullable; snapshot nilai `role` pelaksana pada saat kejadian |
+| `module` | `VARCHAR(50)` | Wajib; kelompok modul (`'auth'`, `'users'`, `'superadmin'`, `'verification'`, `'programs'`, `'collaborations'`) |
+| `action` | `VARCHAR(80)` | Wajib; kode aksi terstruktur (mis. `'user.pemda_created'`, `'user.status_toggled'`, `'verification.decided'`, `'program_application.selected'`, `'collaboration.status_changed'`, `'superadmin.cross_role_action'`) |
+| `auditable_type` | `VARCHAR(100)` | Nullable; nama model/tabel target (mis. `'users'`, `'verification_requests'`, `'collaboration_proposals'`) |
+| `auditable_id` | `BIGINT UNSIGNED` | Nullable; ID record target yang dimodifikasi |
+| `description` | `VARCHAR(255)` | Wajib; ringkasan aktivitas dalam bahasa manusiawi untuk ditampilkan pada tabel Audit Trail |
+| `metadata` | `JSON` | Nullable; menyimpan konteks perubahan (`old`, `new`, `reason`, dsb.) tanpa pernah menyimpan plaintext password/token |
+| `ip_address` | `VARCHAR(45)` | Nullable; alamat IP pelaksana |
+| `created_at` | `TIMESTAMP` | Wajib (`useCurrent()`); *immutable* (tidak memiliki `updated_at` atau `deleted_at`) |
 
-- Gunakan struktur infrastruktur driver sesi database Laravel; index user_id dan last_activity. Sesi tamu diperbolehkan, sehingga UNIQUE(user_id) tidak dipakai.
-- Saat login, kunci baris pengguna dalam transaksi, ganti sesi sebelumnya, regenerasi ID sesi dan tetapkan current_session_id baru. Middleware memeriksa penanda tersebut setiap request. Serialisasi login bersamaan dan pengujian request paralel diperlukan; menghapus sesi lama saja tidak cukup.
-- Saat nonaktivasi, penghapusan akun, atau reset password, hapus sesi pengguna dan kosongkan current_session_id. Status akun dan penanda sesi tetap diperiksa pada setiap request terautentikasi untuk menolak sesi lama yang mungkin tersimpan kembali oleh request paralel.
-- Tautan reset password memakai token yang di-hash, kedaluwarsa, dan sekali pakai. Perubahan password lewat profil membutuhkan password lama. Perubahan email mengosongkan email_verified_at dan mengirim verifikasi ulang.
-- Password sementara tidak disimpan pada kolom terpisah atau log; hanya hash pada password. Distribusikan kredensial awal melalui kanal privat.
+**Indeks `audit_logs`**:
+- `INDEX(module, action, created_at)`
+- `INDEX(actor_id, created_at)`
+- `INDEX(auditable_type, auditable_id)`
 
-## 5. Constraints dan integritas lintas fitur
+---
 
-### Profil dan publikasi
+## 5. Constraints dan Integritas Lintas Fitur
 
-- UNIQUE(businesses.user_id), UNIQUE(partner_profiles.user_id).
-- Validasi role pemilik: businesses hanya umkm; partner_profiles hanya partner. FK users saja tidak membuktikan kesesuaian role. Terapkan pada service/policy; role tidak bisa diubah.
-- Kolom profil opsional: description, contact_phone, logo_path, website_url, business_needs. business_category_id, nama dan alamat wajib ketika profil dipublikasikan. district/subdistrict dapat opsional selama proposal belum mewajibkan detail wilayah. Kota Bandung adalah cakupan tetap, sehingga belum perlu hierarki wilayah nasional.
-- published_at nullable = belum publik. Direktori publik mengecualikan akun disabled/terhapus serta usaha yang belum dipublikasikan.
-- Nama kategori dan jenis kerja sama dinormalisasi pada tabel referensi. PARTNER_COOPERATION_TYPES memakai PK gabungan; satu Mitra dapat memilih beberapa jenis kerja sama.
+### 5.1 Profil UMKM, Publikasi Performa & Profil Mitra (`FR-04`, `FR-10`, `FR-11`, `FR-16`, `FR-22`, `FR-23`)
+- `UNIQUE(businesses.user_id)` dan `UNIQUE(partner_profiles.user_id)`: satu akun UMKM maksimal memiliki satu `businesses`, satu akun Mitra maksimal memiliki satu `partner_profiles`.
+- Validasi role pemilik ditegakkan pada Policy/Service: `businesses` hanya dimiliki `role = 'umkm'`, `partner_profiles` hanya dimiliki `role = 'mitra'`.
+- `businesses.published_at` nullable (`null` = draft/privat). Direktori publik (`FR-10`) hanya menampilkan usaha dengan `published_at != null` yang pemiliknya `account_status = 'enabled'` dan `deleted_at IS NULL`.
+- **Publikasi Performa (`FR-22`, `BR-04`)***: Kolom aditif `public_performance_config` (`JSON` nullable pada `businesses`) menyimpan preferensi UMKM mengenai indikator performa usaha (mis. rentang omzet/jumlah transaksi/produk aktif) yang diizinkan tampil pada halaman profil publik kepada Mitra Industri. Data transaksi individual tetap privat (`NFR-04`).
 
-### Produk, stok, penjualan
+### 5.2 Produk, Stok & Transaksi Penjualan (`FR-05`–`FR-09`, `BR-02`, `BR-03`)
+- `UNIQUE(product_id, variant_key)` pada `product_variants`. Semua produk memiliki minimal satu varian (`variant_key = 'default'` bila tanpa ukuran/warna).
+- `selling_price >= 0`, `stock_quantity >= 0`, `low_stock_threshold >= 0`.
+- `stock_movements`: `type` bernilai `'opening'`, `'restock'`, `'sale'`, `'sale_reversal'`, atau `'adjustment'`. `quantity_delta` bertanda (`+` masuk, `-` keluar, tidak boleh `0`). Saldo `product_variants.stock_quantity` wajib diperbarui secara atomik di dalam `DB::transaction` dengan `lockForUpdate()` bersama pembuatan baris `stock_movements`.
+- `sales`: `status` bernilai `'recorded'` atau `'cancelled'`. `invoice_number` unik. `total_amount` dihitung ulang di sisi server dari `SUM(quantity * unit_price)` pada `sale_items`.
 
-- UNIQUE(product_id, variant_key). variant_key wajib dan kanonis, contoh `default` atau hasil normalisasi pasangan ukuran/warna. Jangan mengandalkan UNIQUE(product_id,size,color) ketika size/color nullable karena MySQL mengizinkan beberapa NULL dalam indeks unik.
-- size, color, sku nullable; sku belum diberi UNIQUE global karena bukan ketentuan bisnis. selling_price >= 0; stock_quantity >= 0; low_stock_threshold >= 0.
-- STOCK_MOVEMENTS: sale_id nullable untuk stok awal/restock/penyesuaian. quantity_delta bertanda: positif masuk, negatif keluar, tidak boleh nol. type = opening, restock, sale, sale_reversal, adjustment. performed_by wajib; notes wajib untuk adjustment.
-- Stok awal juga dicatat sebagai opening. stock_quantity adalah saldo terkini yang dikelola atomik bersama ledger; jangan mengubah saldo langsung tanpa movement.
-- SALES.status = recorded atau cancelled. sold_at wajib; notes dan cancelled_at nullable. invoice_number wajib unik. total_amount = jumlah quantity × unit_price dari item; server menghitung ulang, bukan menerima total klien sebagai kebenaran.
-- SALE_ITEMS: quantity > 0; unit_price >= 0; UNIQUE(sale_id,product_variant_id). Snapshot menjaga laporan lama saat nama/harga katalog berubah; unit_price adalah harga transaksi, bukan referensi dinamis ke harga katalog.
-- Produk item harus berasal dari usaha pemilik transaksi; validasi dalam service karena FK sederhana tidak menjamin kesamaan business_id.
-- Edit penjualan: kunci sale dan varian terdampak dalam urutan ID konsisten; buat reversal movement atas item lama, simpan item baru dan movement keluar baru, lalu hitung total dalam satu transaksi. Edit adalah koreksi data berjalan; versi lengkap invoice lama belum disimpan karena audit versi transaksi tidak diminta.
-- Pembatalan hanya dari recorded, mengembalikan stok tepat sekali melalui reversal; item dan total transaksi tetap disimpan. Transaksi cancelled tidak dapat diedit. Laporan penjualan hanya menghitung recorded.
-- Produk/varian diarsipkan, tidak dihapus bila sudah direferensikan. Arsip tidak menghalangi koreksi transaksi historis yang sah, tetapi melarang penjualan baru.
-- Ledger stok tidak diedit/dihapus; koreksi memakai movement baru. FK ke sale tetap stabil walau sale_items direvisi.
+### 5.3 Proposal, Kesepakatan, Progres, Hasil & Mediasi Kemitraan (`FR-12`, `FR-17`, `FR-18`, `FR-24`, `FR-25`, `FR-28`–`FR-30`)
+- Status `collaboration_proposals`: `'pending'` → `'rejected'` atau `'accepted'` → `'ongoing'` → `'completed'`.
+- `initiated_by` wajib merupakan `user_id` pemilik `business_id` (jika diinisiasi UMKM) atau pemilik `partner_profile_id` (jika diinisiasi Mitra). Hanya pihak penerima (lawan dari `initiated_by`) yang berhak memutuskan `'accepted'` / `'rejected'` (`BR-05`).
+- **Kesepakatan & Hasil Kemitraan (`FR-24`, `FR-30`)***: Setelah proposal `'accepted'`/`'ongoing'`, kedua pihak dapat mencatat ringkasan kesepakatan (`agreement_summary`, `target_goals`, `period_start`, `period_end`) dan pada tahap akhir mencatat realisasi/hasil kolaborasi (`result_summary`) pada `collaboration_proposals`.
+- **Progres Kemitraan (`FR-25` — Tabel Baru `collaboration_updates`)***: Menyimpan riwayat aktivitas dan progres kemitraan secara kronologis (`collaboration_proposal_id`, `created_by`, `activity_title`, `progress_note`, `progress_percentage`, `attachment_path`). Dapat dibaca oleh kedua pihak yang bermitra serta oleh `'pemda'` sesuai kewenangan monitoring (`FR-25.2`, `FR-29`, `BR-13`).
+- **Fasilitasi & Mediasi (`FR-28` — Tabel Baru `mediation_requests`)***: Hanya pihak yang terlibat dalam kemitraan (`business` atau `partner_profile` pada proposal terkait) yang dapat mengajukan permintaan mediasi (`BR-14`). Petugas `'pemda'` meninjau, mencatat `follow_up_note`, dan memperbarui `status` (`'pending'`, `'in_progress'`, `'resolved'`, `'closed'`).
 
-### Proposal dan penawaran digital
+### 5.4 Program Pemerintah, Seleksi Peserta & Undangan VIP (`FR-13`–`FR-15`, `FR-26`–`FR-27`)
+- `programs.status` bernilai `'draft'`, `'published'`, atau `'closed'`. `created_by` merujuk ke user `'pemda'`; seluruh petugas `'pemda'` dapat mengelola program.
+- **Sasaran Peserta & Undangan VIP (`FR-13.1`, `FR-14.2`, `FR-26`, `FR-27`, `BR-08`–`BR-11`)***:
+  - `programs.target_participant` (`'umkm'`, `'mitra'`, `'both'`; default `'umkm'`).
+  - Pada `program_applications`, pendaftaran umum (`entry_type = 'application'`) maupun undangan khusus/VIP (`entry_type = 'vip_invitation'`) disimpan terpadu agar perhitungan kapasitas/kuota berada pada satu sumber kebenaran tunggal.
+  - Satu organisasi tidak boleh terdaftar ganda pada program yang sama (`UNIQUE(program_id, business_id)` untuk UMKM dan `UNIQUE(program_id, partner_profile_id)` untuk Mitra).
+  - Saat petugas `'pemda'` menerima peserta (`status = 'accepted'`) atau saat penerima undangan VIP mengonfirmasi kehadiran, baris `programs` wajib dikunci (`lockForUpdate()`) dalam transaksi untuk memastikan total peserta diterima/terkonfirmasi tidak melebihi `programs.quota` (`BR-10`, `BR-11`).
 
-- Status proposal: pending → rejected atau accepted → ongoing → completed. responded_at wajib setelah keputusan, started_at saat ongoing, completed_at saat completed.
-- digital_offering_id, attachment_path, response_note, responded_at, started_at, completed_at nullable sesuai alur. Penawaran boleh memiliki banyak proposal.
-- initiated_by harus merupakan user pemilik business atau partner_profile yang bersangkutan. Penerima diturunkan dari pihak lainnya, sehingga tidak perlu kolom penerima duplikat. Hanya penerima boleh menerima/menolak.
-- Jika digital_offering_id diisi, offering harus dimiliki Mitra pada proposal tersebut. Proposal minat UMKM memakai offering yang dipublikasikan dan belum diarsipkan. Tawaran Mitra langsung boleh tanpa offering.
-- Setelah dikirim, isi proposal tidak dapat diubah agar dasar keputusan stabil. Tidak ada chat dan tabel kemitraan terpisah; satu proposal diterima merupakan satu kerja sama yang dipantau lewat status.
-- Kedua pihak boleh mengubah ongoing/completed sesuai policy yang disepakati untuk MVP. Jika kelak perlu persetujuan penyelesaian dua pihak, tambahkan alur konfirmasi, bukan menganggapnya sudah termasuk.
+### 5.5 Verifikasi Administratif UMKM (`FR-21`, `BR-12`)
+- `verification_requests.status` bernilai `'pending'`, `'approved'`, atau `'rejected'`.
+- `submitted_data` (`JSON`) menyimpan snapshot identitas usaha saat pengajuan. Maksimal satu pengajuan `'pending'` per `business_id` pada satu waktu.
+- Keputusan `'approved'`/`'rejected'` hanya dilakukan oleh petugas `'pemda'` (`reviewed_by`), wajib menyertakan `review_note` bila `'rejected'`, dan otomatis mencatat entri pada `audit_logs` (`BR-15`).
 
-### Program dan pendaftaran
+---
 
-- UNIQUE(program_id,business_id): satu usaha satu pendaftaran per program. Satu usaha tetap bisa mendaftar banyak program.
-- PROGRAMS.status = draft, published, closed. Waktu pendaftaran juga diperiksa; published tidak otomatis berarti pendaftaran sedang terbuka.
-- quota > 0; registration_opens_at < registration_closes_at; starts_at <= ends_at; registration_closes_at <= starts_at. location dan requirements dapat nullable.
-- created_by wajib user government; ini atribusi pembuat, bukan pembatas kepemilikan. Seluruh government boleh mengelola program. Hak membaca data privat tetap dibatasi kebutuhan fitur.
-- PROGRAM_APPLICATIONS.status = pending, accepted, rejected. reviewed_by, review_note, reviewed_at nullable sebelum keputusan. application_note dan attachment_path opsional.
-- Seleksi menerima peserta dalam transaksi dengan lock baris PROGRAMS, lalu hitung ulang peserta accepted. Semua jalur perubahan keputusan/kuota harus memakai lock program yang sama; quota tidak boleh diturunkan di bawah jumlah accepted.
-- Pendaftaran baru hanya saat program published dan dalam rentang waktu pendaftaran. Kuota membatasi penerimaan, bukan otomatis jumlah pelamar.
+## 6. Pemetaan Lengkap 32 Fitur (FR-01–FR-32) ke Tabel Database
 
-### Verifikasi usaha
+| Kelompok FR | Fitur Utama | Tabel Utama | Status Migrasi Saat Ini |
+|---|---|---|---|
+| **FR-01 – FR-03** | Autentikasi, Profil Akun, Manajemen Pengguna & Pemda | `users`, `sessions`, `password_reset_tokens`, `audit_logs` | `users`, `sessions`, `password_reset_tokens` **Sudah Ada**; `audit_logs` **Migrasi Baru** |
+| **FR-04** | Profil UMKM & Kebutuhan Usaha | `businesses`, `business_categories` | **Sudah Ada** |
+| **FR-05** | Katalog & Arsip Produk | `products`, `product_variants` | **Sudah Ada** |
+| **FR-06** | Manajemen Persediaan & Restock | `product_variants`, `stock_movements` | **Sudah Ada** |
+| **FR-07** | Transaksi Penjualan Atomik | `sales`, `sale_items`, `stock_movements` | **Sudah Ada** |
+| **FR-08 – FR-09** | Dashboard UMKM & Laporan Penjualan CSV | Query agregasi `sales`, `sale_items`, `product_variants` | **Sudah Ada** (Tanpa tabel baru) |
+| **FR-10 – FR-11** | Direktori Publik UMKM & Detail Peluang Usaha | `businesses`, `business_categories`, `verification_requests` | **Sudah Ada** |
+| **FR-12** | Pengajuan & Keputusan Proposal Kolaborasi | `collaboration_proposals`, `cooperation_types` | **Sudah Ada** |
+| **FR-13 – FR-15** | Program Pemerintah, Pendaftaran & Seleksi Peserta | `programs`, `program_applications` | **Sudah Ada** (+ kolom aditif partisipasi Mitra) |
+| **FR-16** | Profil Organisasi Mitra Industri | `partner_profiles`, `cooperation_types`, `partner_cooperation_types` | **Sudah Ada** |
+| **FR-17** | Pengelolaan Status Kemitraan (`ongoing`/`completed`) | `collaboration_proposals`, `audit_logs` | `collaboration_proposals` **Sudah Ada** |
+| **FR-18** | Katalog Solusi Digital Mitra & Minat Kolaborasi | `digital_offerings`, `collaboration_proposals` | **Sudah Ada** |
+| **FR-19 – FR-20** | Dashboard Monitoring Pemda & Ekspor Rekap CSV | Query agregasi `businesses`, `verification_requests`, `programs`, `program_applications`, `collaboration_proposals` | **Sudah Ada** (Tanpa tabel baru) |
+| **FR-21** | Verifikasi Administratif UMKM | `verification_requests`, `audit_logs` | `verification_requests` **Sudah Ada** |
+| **FR-22 – FR-23** | Publikasi Performa Bisnis & Filter Kebutuhan Kolaborasi | `businesses` (+ kolom `public_performance_config`), `sales` (agregasi terfilter izin) | **Migrasi Kolom Aditif** pada `businesses` |
+| **FR-24** | Pencatatan Ringkasan Kesepakatan & Target Kemitraan | `collaboration_proposals` (+ kolom kesepakatan & periode) | **Migrasi Kolom Aditif** pada `collaboration_proposals` |
+| **FR-25** | Catatan Perkembangan & Riwayat Progres Kemitraan | `collaboration_updates`, `collaboration_proposals` | **Migrasi Tabel Baru** (`collaboration_updates`) |
+| **FR-26 – FR-27** | Undangan Khusus (VIP) & Manajemen Terpadu Peserta | `programs`, `program_applications` (+ kolom `entry_type`, `invited_by`, `partner_profile_id`) | **Migrasi Kolom Aditif** pada `programs` & `program_applications` |
+| **FR-28** | Permintaan & Tindak Lanjut Mediasi Kemitraan | `mediation_requests`, `collaboration_proposals` | **Migrasi Tabel Baru** (`mediation_requests`) |
+| **FR-29 – FR-30** | Monitoring Kemitraan Pemda & Laporan Hasil Kolaborasi | `collaboration_proposals` (+ kolom `result_summary`), `collaboration_updates` | **Migrasi Kolom Aditif** pada `collaboration_proposals` |
+| **FR-31 – FR-32** | Administrasi Superadmin Lintas Role & Audit Trail | `audit_logs`, `users` (+ entitas target lintas modul) | **Migrasi Tabel Baru** (`audit_logs`) |
 
-- VERIFICATION_REQUESTS.status = pending, approved, rejected. submitted_data JSON wajib berisi snapshot identitas yang ditinjau, minimal nama usaha, kategori, alamat; snapshot disusun server dari profil, bukan dipercaya dari klien. attachment_path nullable.
-- reviewed_by, reviewed_at nullable sebelum keputusan; review_note wajib saat rejected. Reviewer harus government.
-- Maksimal satu pending per usaha. Serialisasikan pengajuan dengan lock baris businesses; semua jalur pengajuan mengikuti aturan sama. Bila ingin penegakan tambahan pada DB, gunakan generated nullable business ID untuk pending dengan UNIQUE index; UNIQUE(business_id,status) salah karena menghalangi riwayat penolakan berulang.
-- Setelah rejected, pengajuan baru membuat baris baru. Pengajuan/keputusan lama tidak ditimpa. Snapshot dan keputusan bersifat immutable setelah diputuskan.
-- Status tampilan diturunkan dari pengajuan terbaru: belum diajukan, pending, approved, rejected. Tidak perlu menyalin verification_status ke users atau businesses.
-- Ketika approved, perubahan identitas material (nama, kategori, alamat) diblokir pada MVP. Untuk menggantinya, ajukan snapshot perubahan dalam verifikasi baru dan terapkan ke profil hanya setelah approved; business_needs, kontak dan logo dapat diubah biasa. Dengan ini, identitas publik tidak memakai label verified untuk data material yang belum ditinjau. Selama permohonan perubahan pending, tampilkan identitas lama beserta status pemeriksaan perubahan secara terpisah jika diperlukan UI.
+---
 
-### Penghapusan dan FK
+## 7. Urutan Migrasi dan Indeks
 
-- Default FK historis memakai RESTRICT, bukan cascade massal: users → profil, usaha → transaksi, varian → item/movement, profil → proposal, program → pendaftaran, usaha → verifikasi.
-- Akun dihapus operasional lewat soft delete, dengan profil/direktori terkait disembunyikan dan semua sesi dicabut. Riwayat privat hanya dapat dibaca pihak yang berwenang sesuai policy.
-- Pivot jenis kerja sama boleh cascade ketika profil benar-benar dibersihkan tanpa riwayat; operasi cleanup tetap terpisah dari hapus akun biasa.
-- Tabel sesi/token merupakan data sementara, dibersihkan sesuai masa berlaku. password_reset_tokens.email mengikuti konvensi Laravel dan bukan FK; bersihkan token terkait saat email berubah/akun ditutup.
-- Akun baru berbeda identitas kepemilikan. Jangan otomatis memindahkan produk, program, atau proposal hanya karena memakai nama/email serupa.
+### 7.1 Migrasi Baseline yang Sudah Tersedia di `database/migrations/` (Jangan Diedit)
+1. `0001_01_01_000000_create_users_table.php` (`users`, `password_reset_tokens`, `sessions`)
+2. `0001_01_01_000001_create_cache_table.php` & `0001_01_01_000002_create_jobs_table.php`
+3. `2026_11_03_033605_add_role_to_users_table.php` (`role`: `umkm`, `mitra`, `pemda`, `admin`)
+4. `2026_11_06_071511_add_profile_and_status_fields_to_users_table.php` (`phone`, `avatar_path`, `account_status`, `must_change_password`, `current_session_id`, `deleted_at`)
+5. `2026_11_06_071516_create_business_categories_table.php` & `2026_11_06_071521_create_cooperation_types_table.php`
+6. `2026_11_06_071527_create_businesses_table.php`, `2026_11_06_071532_create_partner_profiles_table.php`, `2026_11_06_071544_create_partner_cooperation_types_table.php`
+7. `2026_11_06_071550_create_products_table.php` & `2026_11_06_071556_create_product_variants_table.php`
+8. `2026_11_06_071602_create_sales_table.php`, `2026_11_06_071607_create_sale_items_table.php`, `2026_11_06_071612_create_stock_movements_table.php`
+9. `2026_11_06_071619_create_digital_offerings_table.php` & `2026_11_06_071625_create_collaboration_proposals_table.php`
+10. `2026_11_06_071630_create_programs_table.php`, `2026_11_06_071635_create_program_applications_table.php`, `2026_11_06_071646_create_verification_requests_table.php`
 
-## 6. Pemetaan FR ke tabel
+### 7.2 Urutan Migrasi Baru untuk Perluasan FR-22–FR-32 (Dibuat Sesuai Tiket Fitur)
+11. `create_audit_logs_table` (`KSA-152` / `KSA-153` — Sprint 1 Fondasi Audit & Superadmin)
+12. `add_public_performance_config_to_businesses_table` (`KSA-80` / `FR-22`)
+13. `add_agreement_and_result_fields_to_collaboration_proposals_table` (`KSA-96`, `KSA-108` / `FR-24`, `FR-30`)
+14. `create_collaboration_updates_table` (`KSA-100` / `FR-25`)
+15. `add_vip_and_partner_support_to_programs_and_applications_tables` (`KSA-116`, `KSA-124`, `KSA-128` / `FR-14`, `FR-26`, `FR-27`)
+16. `create_mediation_requests_table` (`KSA-104` / `FR-28`)
 
-| FR | Tabel utama |
-|---|---|
-| 01–03 | users, sessions, password_reset_tokens |
-| 04 | businesses, business_categories |
-| 05 | products, product_variants |
-| 06 | product_variants, stock_movements |
-| 07 | sales, sale_items, stock_movements |
-| 08–09 | Query agregasi sales/sale_items/varian; tidak perlu tabel dashboard/laporan |
-| 10–11 | businesses, business_categories, verification_requests |
-| 12 | collaboration_proposals, cooperation_types |
-| 13 | programs |
-| 14–15 | program_applications, programs |
-| 16 | partner_profiles, cooperation_types, partner_cooperation_types |
-| 17 | collaboration_proposals |
-| 18 | digital_offerings, collaboration_proposals |
-| 19–20 | Query agregasi usaha, verifikasi, program, pendaftaran dan proposal |
-| 21 | verification_requests |
+---
 
-Total 18 tabel pada rancangan ini, termasuk dua tabel infrastruktur autentikasi. Tabel framework seperti cache, jobs atau failed_jobs ditambahkan hanya bila driver/fitur yang dipakai memerlukannya.
-
-## 7. Urutan migration dan index
-
-1. users; password_reset_tokens; sessions.
-2. business_categories; cooperation_types.
-3. businesses; partner_profiles; partner_cooperation_types.
-4. products; product_variants.
-5. sales; sale_items; stock_movements.
-6. digital_offerings; collaboration_proposals.
-7. programs; program_applications; verification_requests.
-
-Selain index FK/UNIQUE, tambahkan sesuai pola akses: sales(business_id,status,sold_at), stock_movements(product_variant_id,created_at), program_applications(program_id,status), verification_requests(business_id,created_at), collaboration_proposals(business_id,status), collaboration_proposals(partner_profile_id,status), businesses(business_category_id,published_at). Jangan menambah index setiap kolom tanpa kebutuhan query.
-
-Cardinality products → variants dan sales → items minimum satu ditegakkan alur service dalam transaksi; FK saja tidak menjamin induk selalu memiliki anak. Kardinalitas profil 0..1 pada diagram mencerminkan akun yang belum menyelesaikan onboarding; setelah onboarding profil yang sesuai peran wajib tersedia.
-
-## 8. Acuan implementasi resmi
-
-- [Laravel 13 Email Verification](https://laravel.com/framework/docs/13.x/verification): email_verified_at dan verifikasi email bawaan.
-- [Laravel 13 Query Builder](https://laravel.com/framework/docs/13.x/queries): pessimistic locking dan lockForUpdate dalam transaksi.
-- [Laravel 13 sessions source documentation](https://github.com/laravel/docs/blob/13.x/session.md): struktur sesi database, regenerasi ID dan invalidasi sesi.
-
-Rancangan domain dan kebijakan tambahan di atas merupakan usulan KONEKSA berdasarkan kebutuhan yang dikonfirmasi, bukan klaim bahwa seluruh aturan tersebut ditegakkan otomatis oleh Laravel.
+## 8. Acuan Implementasi Resmi
+- [Laravel 13 Authentication & Session](https://laravel.com/docs/13.x/authentication): Session guard, regenerasi ID sesi, dan invalidasi sesi.
+- [Laravel 13 Authorization (Gates & Policies)](https://laravel.com/docs/13.x/authorization): Otorisasi berbasis role dan kepemilikan model.
+- [Laravel 13 Database Transactions & Pessimistic Locking](https://laravel.com/docs/13.x/queries#pessimistic-locking): `DB::transaction` dan `lockForUpdate()` untuk mutasi stok dan kuota program.

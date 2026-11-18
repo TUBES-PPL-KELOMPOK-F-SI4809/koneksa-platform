@@ -42,6 +42,27 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink v-if="$page.props.auth.user.role === 'umkm'" :href="route('business-profile.edit')" :active="route().current('business-profile.*')">
                                     Profil Usaha
                                 </NavLink>
+                                <NavLink
+                                    v-if="$page.props.auth.user?.role === 'admin'"
+                                    :href="route('admin.supervision.index')"
+                                    :active="route().current('admin.supervision.index')"
+                                >
+                                    Panel Supervisi
+                                </NavLink>
+                                <NavLink
+                                    v-if="$page.props.auth.user?.role === 'admin'"
+                                    :href="route('admin.users.index')"
+                                    :active="route().current('admin.users.index')"
+                                >
+                                    Manajemen Pengguna
+                                </NavLink>
+                                <NavLink
+                                    v-if="$page.props.auth.user?.role === 'admin'"
+                                    :href="route('admin.audit_logs.index')"
+                                    :active="route().current('admin.audit_logs.index')"
+                                >
+                                    Audit Trail
+                                </NavLink>
                             </div>
                         </div>
 

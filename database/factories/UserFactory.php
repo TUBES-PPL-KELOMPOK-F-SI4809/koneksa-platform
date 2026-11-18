@@ -27,7 +27,13 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'role' => User::ROLE_UMKM,
+            'account_status' => User::STATUS_ENABLED,
+            'phone' => '0812'.fake()->numerify('########'),
+            'avatar_path' => null,
             'email_verified_at' => now(),
+            'must_change_password' => false,
+            'current_session_id' => null,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
@@ -40,6 +46,66 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an UMKM.
+     */
+    public function umkm(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_UMKM,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a Mitra Industri.
+     */
+    public function mitra(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_MITRA,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a Pemerintah Daerah (Pemda).
+     */
+    public function pemda(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_PEMDA,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a Superadmin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_ADMIN,
+        ]);
+    }
+
+    /**
+     * Indicate that the user account is disabled.
+     */
+    public function disabled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'account_status' => User::STATUS_DISABLED,
+        ]);
+    }
+
+    /**
+     * Indicate that the user must change password upon next login.
+     */
+    public function mustChangePassword(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'must_change_password' => true,
         ]);
     }
 }

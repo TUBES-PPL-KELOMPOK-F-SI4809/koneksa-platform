@@ -19,7 +19,8 @@ class RegisterRequest extends FormRequest
     }
 
     /**
-     * Aturan validasi registrasi (termasuk enum role).
+     * Aturan validasi registrasi publik.
+     * Hanya role UMKM dan Mitra Industri yang diizinkan mendaftar secara publik (BR-01, FR-01.1).
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -28,8 +29,20 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'string', Rule::in(['umkm', 'mitra', 'pemda'])],
+            'role' => ['required', 'string', Rule::in(User::PUBLIC_ROLES)],
             'password' => ['required', 'confirmed', Password::defaults()],
+        ];
+    }
+
+    /**
+     * Pesan kustom untuk validasi registrasi.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'role.in' => 'Pendaftaran publik hanya diizinkan untuk peran Pelaku UMKM atau Mitra Industri.',
         ];
     }
 }

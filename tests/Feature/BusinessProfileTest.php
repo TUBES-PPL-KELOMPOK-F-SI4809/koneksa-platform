@@ -38,6 +38,24 @@ class BusinessProfileTest extends TestCase
         $this->actingAs($other)->get(route('business-profile.edit'))->assertOk()->assertDontSee('Nama Baru');
     }
 
+    public function test_verified_umkm_can_log_in_save_a_business_profile_and_log_out(): void
+    {
+        $category = DB::table('business_categories')->insertGetId(['name' => 'Kuliner', 'created_at' => now(), 'updated_at' => now()]);
+        $user = User::factory()->umkm()->create();
+
+        $this->post(route('login'), ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect(route('dashboard', absolute: false));
+        $this->get(route('business-profile.edit'))->assertOk();
+        $this->put(route('business-profile.update'), [
+            'name' => 'Usaha Setelah Login',
+            'business_category_id' => $category,
+        ])->assertRedirect(route('business-profile.edit'))->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('businesses', ['user_id' => $user->id, 'name' => 'Usaha Setelah Login']);
+
+        $this->post(route('logout'))->assertRedirect('/');
+        $this->get(route('business-profile.edit'))->assertRedirect(route('login'));
+    }
+
     public function test_access_requires_authenticated_enabled_verified_umkm(): void
     {
         $this->get(route('business-profile.edit'))->assertRedirect(route('login'));
