@@ -36,10 +36,10 @@ Dokumen ini mencatat seluruh rangkaian instruksi prompt AI per fase yang digunak
 | **2. Login & Session** | `KSA-11` | `KSA-32`, `KSA-33`, `KSA-161` | `feat/KSA-11-auth-session` | PR Ready |
 | **3. RBAC & Ownership** | `KSA-12` | `KSA-34`, `KSA-35`, `KSA-162` | `feat/KSA-12-rbac-ownership` | PR Ready |
 | **4. Profil & Password** | `KSA-13` | `KSA-36`, `KSA-37`, `KSA-163` | `feat/KSA-13-account-profile` | PR Ready |
-| **5. Audit Trail** | `KSA-152` | `KSA-153`, `KSA-154`, `KSA-155` | `feat/KSA-152-audit-trail` | Dalam Implementasi |
-| **6. User Management** | `KSA-38` | `KSA-39`, `KSA-40`, `KSA-164` | `feat/KSA-38-user-management` | Backlog Sprint 1 |
-| **6. Superadmin** | `KSA-148` | `KSA-149`, `KSA-150`, `KSA-151` | `feat/KSA-148-superadmin` | Backlog Sprint 1 |
-| **7. Final Testing** | Semua | Integrasi & Regresi | Per Story / PR | Berjalan per fase |
+| **5. Audit Trail** | `KSA-152` | `KSA-153`, `KSA-154`, `KSA-155` | `feat/KSA-152-audit-trail` | PR Ready (`fe54205`) |
+| **6. User Management** | `KSA-38` | `KSA-39`, `KSA-40`, `KSA-164` | `feat/KSA-38-user-management` | PR Ready (`f677499`) |
+| **6. Superadmin** | `KSA-148` | `KSA-149`, `KSA-150`, `KSA-151` | `feat/KSA-148-superadmin` | PR Ready (`0b26cab`) |
+| **7. Final Testing** | Semua | Integrasi & Regresi | Seluruh Branch (7 Story) | Terverifikasi Lulus |
 
 ---
 
