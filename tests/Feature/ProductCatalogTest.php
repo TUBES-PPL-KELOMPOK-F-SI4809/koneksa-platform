@@ -271,6 +271,16 @@ class ProductCatalogTest extends TestCase
         $this->get(route('umkm.products.index', ['page' => 2]))->assertInertia(fn (Assert $page) => $page->has('products.data', 2));
     }
 
+    #[TestWith(['search', ['invalid']])]
+    #[TestWith(['status', 'unsupported'])]
+    public function test_invalid_catalog_filters_return_validation_errors(string $field, mixed $value): void
+    {
+        [$owner] = $this->business();
+
+        $this->actingAs($owner)->getJson(route('umkm.products.index', [$field => $value]))
+            ->assertUnprocessable()->assertJsonValidationErrors($field);
+    }
+
     public function test_archive_preserves_sale_snapshots_stock_and_ledger_and_blocks_operational_use(): void
     {
         [$owner, $product, $variant] = $this->product();

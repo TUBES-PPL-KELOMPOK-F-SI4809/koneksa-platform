@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\IndexProductRequest;
 use App\Http\Requests\Product\SaveProductRequest;
 use App\Models\Product;
 use App\Services\Product\ProductService;
@@ -17,10 +18,9 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(IndexProductRequest $request): Response
     {
-        Gate::authorize('viewAny', Product::class);
-        $filters = $request->validate(['search' => ['nullable', 'string', 'max:150'], 'status' => ['nullable', 'in:active,archived,all']]);
+        $filters = $request->validated();
         $status = $filters['status'] ?? 'active';
         $search = $filters['search'] ?? '';
         $owned = Product::whereHas('business', fn (Builder $query) => $query->where('user_id', $request->user()->id));
