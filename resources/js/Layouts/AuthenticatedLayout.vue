@@ -41,6 +41,13 @@ const showingNavigationDropdown = ref(false);
                                 </NavLink>
                                 <NavLink
                                     v-if="$page.props.auth.user?.role === 'admin'"
+                                    :href="route('admin.supervision.index')"
+                                    :active="route().current('admin.supervision.index')"
+                                >
+                                    Panel Supervisi
+                                </NavLink>
+                                <NavLink
+                                    v-if="$page.props.auth.user?.role === 'admin'"
                                     :href="route('admin.users.index')"
                                     :active="route().current('admin.users.index')"
                                 >

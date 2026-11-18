@@ -60,4 +60,12 @@ class BusinessPolicy
     {
         return $user->isUmkm() && $business->user_id === $user->id;
     }
+
+    /**
+     * Tentukan apakah Superadmin dapat melakukan tindakan supervisi administratif lintas modul (KSA-148 / FR-31).
+     */
+    public function supervise(User $user, Business $business): bool
+    {
+        return $user->isAdmin();
+    }
 }
