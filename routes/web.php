@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\SupervisionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\Inventory\RestockController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Business;
 use App\Models\PartnerProfile;
@@ -44,6 +45,8 @@ Route::middleware(['auth', 'role:umkm'])
     ->name('umkm.')
     ->group(function () {
         Route::get('/dashboard', fn () => Inertia::render('Umkm/Dashboard'))->name('dashboard');
+        Route::get('/inventory', [RestockController::class, 'index'])->name('inventory.index');
+        Route::post('/inventory/{variant}/restocks', [RestockController::class, 'store'])->name('inventory.restocks.store');
         Route::get('/business/{business}', fn (Business $business) => response()->json($business))
             ->can('view', 'business')
             ->name('business.show');
