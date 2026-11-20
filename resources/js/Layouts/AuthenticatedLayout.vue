@@ -49,6 +49,7 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Persediaan
                                 </NavLink>
+                                <NavLink v-if="$page.props.auth.user?.role === 'umkm'" :href="route('umkm.products.index')" :active="route().current('umkm.products.*')">Produk</NavLink>
                                 <NavLink
                                     v-if="$page.props.auth.user?.role === 'admin'"
                                     :href="route('admin.supervision.index')"
@@ -200,6 +201,7 @@ const showingNavigationDropdown = ref(false);
                         >
                             Persediaan
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink v-if="$page.props.auth.user?.role === 'umkm'" :href="route('umkm.products.index')" :active="route().current('umkm.products.*')">Produk</ResponsiveNavLink>
                     </div>
 
                     <!-- Responsive Settings Options -->

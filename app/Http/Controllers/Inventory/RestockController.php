@@ -24,8 +24,7 @@ class RestockController extends Controller
         return Inertia::render('Inventory/Index', [
             'variants' => ProductVariant::with('product:id,name,unit')
                 ->whereHas('product', $ownedProduct)
-                ->whereHas('product', fn (Builder $query) => $query->whereNull('archived_at'))
-                ->whereNull('archived_at')
+                ->availableForSale()
                 ->select(['id', 'product_id', 'variant_key', 'sku', 'size', 'color', 'stock_quantity'])
                 ->orderBy('product_id')->orderBy('id')
                 ->paginate(12, pageName: 'stock_page')->withQueryString(),

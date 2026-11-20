@@ -35,6 +35,7 @@ const initials = computed(() => page.props.auth.user.name.trim().split(/\s+/)
 const navigation = [
     { label: 'Dashboard', name: 'dashboard', icon: 'M3.75 3.75h6v6h-6zm10.5 0h6v6h-6zm-10.5 10.5h6v6h-6zm10.5 0h6v6h-6z' },
     { label: 'Profil usaha', name: 'business-profile.edit', icon: 'M3 21h18M5 21V4h14v17M9 8h1m4 0h1M9 12h1m4 0h1M10 21v-5h4v5' },
+    { label: 'Produk', name: 'umkm.products.index', icon: 'M3 7h18M5 7V4h14v3M5 7v13h14V7M9 11h6' },
     { label: 'Persediaan', name: 'umkm.inventory.index', icon: 'm3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10' },
     { label: 'Profil akun', name: 'profile.edit', icon: 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20a7.5 7.5 0 0 1 15 0' },
 ];
