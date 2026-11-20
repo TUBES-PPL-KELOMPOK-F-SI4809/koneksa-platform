@@ -27,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::define('manage-business-profile', fn (User $user): bool => $user->role === 'umkm' && $user->account_status === 'enabled'
+            && $user->email_verified_at !== null && ! $user->must_change_password
+            && $user->deleted_at === null
+        );
+
         Vite::prefetch(concurrency: 3);
 
         Gate::policy(Business::class, BusinessPolicy::class);

@@ -26,6 +26,12 @@ Sumber rancangan tunggal adalah [RANCANGAN_ERD_KONEKSA.md](RANCANGAN_ERD_KONEKSA
 
 Untuk tata cara pembuatan migrasi dan model baru, ikuti [panduan pengembangan fitur](../guidelines/FEATURE-DEVELOPMENT-GUIDE.md).
 
+## Profil Usaha (`FR-04.1`, `KSA-15`)
+
+- `GET /business-profile` (`business-profile.edit`) menampilkan profil milik akun UMKM yang sedang login, daftar kategori, dan `identityLocked`. Nilai ini mengikuti pemeriksaan backend yang sudah ada: identitas terkunci jika profil tersebut pernah memiliki pengajuan verifikasi berstatus `approved`.
+- `PUT /business-profile` (`business-profile.update`) membuat atau memperbarui satu profil milik akun melalui `BusinessProfileService`, dengan validasi server dan penguncian dalam transaksi. Form hanya mengirim nama, kategori, deskripsi, alamat, kecamatan, kelurahan, serta telepon usaha.
+- UI mengunci nama, kategori, dan alamat sesuai `identityLocked`; pemeriksaan server tetap berlaku. Pengaturan publikasi/kebutuhan usaha berada pada FR terpisah. Tidak ada perubahan skema untuk pembaruan UI ini.
+
 ## Katalog dan Arsip Produk (`FR-05.1`, `FR-05.2`, `KSA-19`)
 
 - `GET /umkm/products` (`umkm.products.index`) menampilkan produk milik akun UMKM, dengan pencarian nama (`search`, maksimal 150 karakter), filter `status=active|archived|all` (default `active`), dan paginasi 12 produk. Ringkasan jumlah selalu mencakup katalog milik sendiri, terlepas dari filter pencarian.

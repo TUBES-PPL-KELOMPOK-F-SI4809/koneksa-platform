@@ -39,6 +39,9 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink v-if="$page.props.auth.user.role === 'umkm'" :href="route('business-profile.edit')" :active="route().current('business-profile.*')">
+                                    Profil Usaha
+                                </NavLink>
                                 <NavLink
                                     v-if="$page.props.auth.user?.role === 'umkm'"
                                     :href="route('umkm.inventory.index')"
@@ -130,6 +133,9 @@ const showingNavigationDropdown = ref(false);
                         <!-- Hamburger -->
                         <div class="-me-2 flex items-center sm:hidden">
                             <button
+                                type="button"
+                                aria-label="Menu navigasi"
+                                :aria-expanded="showingNavigationDropdown"
                                 @click="
                                     showingNavigationDropdown =
                                         !showingNavigationDropdown
@@ -184,6 +190,9 @@ const showingNavigationDropdown = ref(false);
                             :active="route().current('dashboard')"
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink v-if="$page.props.auth.user.role === 'umkm'" :href="route('business-profile.edit')" :active="route().current('business-profile.*')">
+                            Profil Usaha
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             v-if="$page.props.auth.user?.role === 'umkm'"

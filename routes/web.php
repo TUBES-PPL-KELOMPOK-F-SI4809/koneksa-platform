@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\SupervisionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\Inventory\RestockController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -29,6 +30,10 @@ Route::get('/dashboard', function (Request $request) {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::middleware('can:manage-business-profile')->group(function () {
+        Route::get('/business-profile', [BusinessProfileController::class, 'edit'])->name('business-profile.edit');
+        Route::put('/business-profile', [BusinessProfileController::class, 'update'])->name('business-profile.update');
+    });
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

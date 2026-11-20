@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, useSlots } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import KoneksaLogo from '@/Components/KoneksaLogo.vue';
 import {
@@ -9,16 +9,24 @@ import {
 } from '@/Components/ui/sidebar';
 
 defineProps({
-    title: String, subtitle: String, inventoryCount: Number,
+    title: String,
+    subtitle: String,
+    inventoryCount: Number,
     guideTitle: { type: String, default: 'Panduan restock' },
     guideDescription: { type: String, default: 'Tiga langkah untuk mencatat barang masuk.' },
-    guideSteps: { type: Array, default: () => [
-        { title: '1. Pilih produk', description: 'Klik Tambah stok pada varian produk yang menerima barang.' },
-        { title: '2. Isi jumlah masuk', description: 'Masukkan jumlah barang dan catatan bila diperlukan.' },
-        { title: '3. Simpan dan periksa', description: 'Simpan restock, lalu periksa stok dan riwayat yang diperbarui.' },
-    ] },
+    guideSteps: {
+        type: Array,
+        default: () => [
+            { title: '1. Pilih produk', description: 'Klik Tambah stok pada varian produk yang menerima barang.' },
+            { title: '2. Isi jumlah masuk', description: 'Masukkan jumlah barang dan catatan bila diperlukan.' },
+            { title: '3. Simpan dan periksa', description: 'Simpan restock, lalu periksa stok dan riwayat yang diperbarui.' },
+        ],
+    },
 });
 const page = usePage();
+const slots = useSlots();
+const menuQuery = ref('');
+const menuSearch = ref(null);
 const showGuide = ref(false);
 const guideHeading = ref(null);
 const guideTrigger = ref(null);
@@ -26,10 +34,24 @@ const initials = computed(() => page.props.auth.user.name.trim().split(/\s+/)
     .slice(0, 2).map((part) => part[0]).join('').toUpperCase());
 const navigation = [
     { label: 'Dashboard', name: 'dashboard', icon: 'M3.75 3.75h6v6h-6zm10.5 0h6v6h-6zm-10.5 10.5h6v6h-6zm10.5 0h6v6h-6z' },
+    { label: 'Profil usaha', name: 'business-profile.edit', icon: 'M3 21h18M5 21V4h14v17M9 8h1m4 0h1M9 12h1m4 0h1M10 21v-5h4v5' },
     { label: 'Produk', name: 'umkm.products.index', icon: 'M3 7h18M5 7V4h14v3M5 7v13h14V7M9 11h6' },
     { label: 'Persediaan', name: 'umkm.inventory.index', icon: 'm3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10' },
     { label: 'Profil akun', name: 'profile.edit', icon: 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20a7.5 7.5 0 0 1 15 0' },
 ];
+const filteredNavigation = computed(() => navigation.filter((item) =>
+    item.label.toLocaleLowerCase('id-ID').includes(menuQuery.value.trim().toLocaleLowerCase('id-ID'))));
+
+function focusMenuSearch(event) {
+    if (!slots.search && event.key === '/' && !event.ctrlKey && !event.metaKey
+        && !event.target?.matches('input, textarea, select, [contenteditable="true"]')
+        && menuSearch.value?.offsetParent) {
+        event.preventDefault();
+        menuSearch.value.focus();
+    }
+}
+onMounted(() => document.addEventListener('keydown', focusMenuSearch));
+onUnmounted(() => document.removeEventListener('keydown', focusMenuSearch));
 
 async function toggleGuide(setOpenMobile) {
     if (setOpenMobile) {
@@ -57,18 +79,23 @@ async function toggleGuide(setOpenMobile) {
                     </Link>
                 </SidebarHeader>
                 <SidebarContent>
+                    <label v-if="!slots.search && (state !== 'collapsed' || isMobile)" class="mx-2 mb-1 block sm:hidden">
+                        <span class="sr-only">Cari menu UMKM</span>
+                        <input v-model="menuQuery" type="search" placeholder="Cari menu…" class="h-11 w-full rounded-full border-hairline bg-canvas px-4 text-sm focus:border-primary-500 focus:ring-primary-500" />
+                    </label>
                     <SidebarGroup>
                         <SidebarGroupLabel>Ruang usaha</SidebarGroupLabel>
                         <SidebarGroupContent>
                             <nav aria-label="Menu UMKM">
                                 <SidebarMenu>
-                                    <SidebarMenuItem v-for="item in navigation" :key="item.name">
+                                    <SidebarMenuItem v-for="item in filteredNavigation" :key="item.name">
                                         <SidebarMenuButton :href="route(item.name)" :is-active="route().current(item.name)" :tooltip="item.label" @click="setOpenMobile(false)">
                                             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" /></svg>
                                             <span v-if="state !== 'collapsed' || isMobile" class="truncate">{{ item.label }}</span>
                                             <SidebarMenuBadge v-if="item.name === 'umkm.inventory.index' && inventoryCount !== undefined">{{ inventoryCount }}</SidebarMenuBadge>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
+                                    <li v-if="!filteredNavigation.length && (state !== 'collapsed' || isMobile)" role="status" class="p-3 text-sm text-ink-muted">Menu tidak ditemukan.</li>
                                 </SidebarMenu>
                             </nav>
                         </SidebarGroupContent>
@@ -101,10 +128,18 @@ async function toggleGuide(setOpenMobile) {
                     <div class="flex min-w-0 items-center gap-3">
                         <SidebarTrigger />
                         <span class="text-sm font-semibold text-ink-secondary sm:hidden">Ruang UMKM</span>
-                        <div class="hidden sm:block"><slot name="search" /></div>
+                        <div class="hidden sm:block">
+                            <slot name="search">
+                                <label class="relative block">
+                                    <span class="sr-only">Cari menu UMKM</span>
+                                    <input ref="menuSearch" v-model="menuQuery" type="search" placeholder="Cari menu cepat…" class="h-11 w-56 rounded-full border-hairline bg-canvas pl-4 pr-10 text-sm placeholder:text-ink-muted focus:border-primary-500 focus:ring-primary-500" />
+                                    <kbd class="pointer-events-none absolute right-4 top-3 font-mono text-sm text-ink-muted" aria-hidden="true">/</kbd>
+                                </label>
+                            </slot>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button ref="guideTrigger" type="button" class="flex h-11 items-center gap-2 rounded-full border border-hairline bg-canvas px-3 text-sm font-medium text-ink-secondary hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" :aria-expanded="showGuide" aria-controls="quick-guide" :aria-label="`Tampilkan ${guideTitle.toLowerCase()}`" @click="toggleGuide()">
+                        <button ref="guideTrigger" type="button" class="flex h-11 items-center gap-2 rounded-full border border-hairline bg-canvas px-3 text-sm font-medium text-ink-secondary hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" :aria-expanded="showGuide" aria-controls="quick-guide" :aria-label="`Tampilkan ${guideTitle.toLocaleLowerCase('id-ID')}`" @click="toggleGuide()">
                             <span aria-hidden="true" class="flex h-5 w-5 items-center justify-center rounded-full border border-current font-semibold">?</span>
                             <span class="hidden lg:inline">Panduan</span>
                         </button>
