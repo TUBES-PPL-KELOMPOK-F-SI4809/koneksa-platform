@@ -8,7 +8,16 @@ import {
     SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger,
 } from '@/Components/ui/sidebar';
 
-defineProps({ title: String, subtitle: String, inventoryCount: Number });
+defineProps({
+    title: String, subtitle: String, inventoryCount: Number,
+    guideTitle: { type: String, default: 'Panduan restock' },
+    guideDescription: { type: String, default: 'Tiga langkah untuk mencatat barang masuk.' },
+    guideSteps: { type: Array, default: () => [
+        { title: '1. Pilih produk', description: 'Klik Tambah stok pada varian produk yang menerima barang.' },
+        { title: '2. Isi jumlah masuk', description: 'Masukkan jumlah barang dan catatan bila diperlukan.' },
+        { title: '3. Simpan dan periksa', description: 'Simpan restock, lalu periksa stok dan riwayat yang diperbarui.' },
+    ] },
+});
 const page = usePage();
 const showGuide = ref(false);
 const guideHeading = ref(null);
@@ -17,12 +26,16 @@ const initials = computed(() => page.props.auth.user.name.trim().split(/\s+/)
     .slice(0, 2).map((part) => part[0]).join('').toUpperCase());
 const navigation = [
     { label: 'Dashboard', name: 'dashboard', icon: 'M3.75 3.75h6v6h-6zm10.5 0h6v6h-6zm-10.5 10.5h6v6h-6zm10.5 0h6v6h-6z' },
+    { label: 'Produk', name: 'umkm.products.index', icon: 'M3 7h18M5 7V4h14v3M5 7v13h14V7M9 11h6' },
     { label: 'Persediaan', name: 'umkm.inventory.index', icon: 'm3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10' },
     { label: 'Profil akun', name: 'profile.edit', icon: 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20a7.5 7.5 0 0 1 15 0' },
 ];
 
 async function toggleGuide(setOpenMobile) {
-    setOpenMobile?.(false);
+    if (setOpenMobile) {
+        setOpenMobile(false);
+        await nextTick();
+    }
     showGuide.value = !showGuide.value;
     await nextTick();
     if (showGuide.value) {
@@ -53,7 +66,7 @@ async function toggleGuide(setOpenMobile) {
                                         <SidebarMenuButton :href="route(item.name)" :is-active="route().current(item.name)" :tooltip="item.label" @click="setOpenMobile(false)">
                                             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" /></svg>
                                             <span v-if="state !== 'collapsed' || isMobile" class="truncate">{{ item.label }}</span>
-                                            <SidebarMenuBadge v-if="item.name === 'umkm.inventory.index'">{{ inventoryCount }}</SidebarMenuBadge>
+                                            <SidebarMenuBadge v-if="item.name === 'umkm.inventory.index' && inventoryCount !== undefined">{{ inventoryCount }}</SidebarMenuBadge>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 </SidebarMenu>
@@ -65,9 +78,9 @@ async function toggleGuide(setOpenMobile) {
                         <SidebarGroupContent>
                             <SidebarMenu>
                                 <SidebarMenuItem>
-                                    <SidebarMenuButton tooltip="Panduan restock" :aria-expanded="showGuide" aria-controls="quick-guide" @click="toggleGuide(setOpenMobile)">
+                                    <SidebarMenuButton :tooltip="guideTitle" :aria-expanded="showGuide" aria-controls="quick-guide" @click="toggleGuide(setOpenMobile)">
                                         <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path stroke-linecap="round" d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .5-1.5 1-1.5 2M12 16h.01" /></svg>
-                                        <span v-if="state !== 'collapsed' || isMobile">Panduan restock</span>
+                                        <span v-if="state !== 'collapsed' || isMobile">{{ guideTitle }}</span>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </SidebarMenu>
@@ -91,7 +104,7 @@ async function toggleGuide(setOpenMobile) {
                         <div class="hidden sm:block"><slot name="search" /></div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button ref="guideTrigger" type="button" class="flex h-11 items-center gap-2 rounded-full border border-hairline bg-canvas px-3 text-sm font-medium text-ink-secondary hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" :aria-expanded="showGuide" aria-controls="quick-guide" aria-label="Tampilkan panduan restock" @click="toggleGuide()">
+                        <button ref="guideTrigger" type="button" class="flex h-11 items-center gap-2 rounded-full border border-hairline bg-canvas px-3 text-sm font-medium text-ink-secondary hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" :aria-expanded="showGuide" aria-controls="quick-guide" :aria-label="`Tampilkan ${guideTitle.toLowerCase()}`" @click="toggleGuide()">
                             <span aria-hidden="true" class="flex h-5 w-5 items-center justify-center rounded-full border border-current font-semibold">?</span>
                             <span class="hidden lg:inline">Panduan</span>
                         </button>
@@ -111,14 +124,12 @@ async function toggleGuide(setOpenMobile) {
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <h2 id="guide-heading" ref="guideHeading" tabindex="-1" class="rounded text-base font-semibold text-primary-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">Panduan langkah awal</h2>
-                                    <p class="mt-1 text-sm text-primary-700">Tiga langkah untuk mencatat barang masuk.</p>
+                                    <p class="mt-1 text-sm text-primary-700">{{ guideDescription }}</p>
                                 </div>
                                 <button type="button" class="min-h-11 rounded-xl px-3 text-sm font-semibold text-primary-700 hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" @click="toggleGuide()">Tutup</button>
                             </div>
                             <ol class="mt-4 grid gap-3 sm:grid-cols-3">
-                                <li class="rounded-xl border border-primary-100 bg-white p-4"><h3 class="text-sm font-semibold">1. Pilih produk</h3><p class="mt-1 text-sm text-ink-secondary">Klik Tambah stok pada varian produk yang menerima barang.</p></li>
-                                <li class="rounded-xl border border-primary-100 bg-white p-4"><h3 class="text-sm font-semibold">2. Isi jumlah masuk</h3><p class="mt-1 text-sm text-ink-secondary">Masukkan jumlah barang dan catatan bila diperlukan.</p></li>
-                                <li class="rounded-xl border border-primary-100 bg-white p-4"><h3 class="text-sm font-semibold">3. Simpan dan periksa</h3><p class="mt-1 text-sm text-ink-secondary">Simpan restock, lalu periksa stok dan riwayat yang diperbarui.</p></li>
+                                <li v-for="step in guideSteps" :key="step.title" class="rounded-xl border border-primary-100 bg-white p-4"><h3 class="text-sm font-semibold">{{ step.title }}</h3><p class="mt-1 text-sm text-ink-secondary">{{ step.description }}</p></li>
                             </ol>
                         </section>
                         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">

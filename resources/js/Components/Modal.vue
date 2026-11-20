@@ -16,7 +16,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'closed']);
 const dialog = ref();
 const showSlot = ref(props.show);
 
@@ -34,6 +34,7 @@ watch(
             setTimeout(() => {
                 dialog.value?.close();
                 showSlot.value = false;
+                emit('closed');
             }, 200);
         }
     },
