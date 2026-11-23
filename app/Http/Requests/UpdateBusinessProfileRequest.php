@@ -22,6 +22,8 @@ class UpdateBusinessProfileRequest extends FormRequest
             'district' => ['nullable', 'string', 'max:100'],
             'subdistrict' => ['nullable', 'string', 'max:100'],
             'contact_phone' => ['nullable', 'string', 'max:30'],
+            'business_needs' => ['nullable', 'string', 'max:10000'],
+            'is_published' => ['sometimes', 'required', 'boolean'],
         ];
     }
 
@@ -33,6 +35,8 @@ class UpdateBusinessProfileRequest extends FormRequest
             'max.string' => ':attribute tidak boleh lebih dari :max karakter.',
             'integer' => ':attribute tidak valid.',
             'exists' => ':attribute yang dipilih tidak valid.',
+            'boolean' => ':attribute harus berupa pilihan publik atau draft.',
+            'business_needs.max' => 'Kebutuhan pengembangan usaha tidak boleh lebih dari :max karakter.',
         ];
     }
 
@@ -46,6 +50,8 @@ class UpdateBusinessProfileRequest extends FormRequest
             'district' => 'Kecamatan',
             'subdistrict' => 'Kelurahan',
             'contact_phone' => 'Telepon usaha',
+            'business_needs' => 'Kebutuhan pengembangan usaha',
+            'is_published' => 'Status publikasi',
         ];
     }
 }

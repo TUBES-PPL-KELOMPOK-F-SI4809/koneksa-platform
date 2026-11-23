@@ -57,7 +57,7 @@ Route::middleware(['auth', 'role:umkm'])
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::post('/products/{product}/archive', [ProductController::class, 'archive'])->name('products.archive');
         Route::post('/inventory/{variant}/restocks', [RestockController::class, 'store'])->name('inventory.restocks.store');
-        Route::get('/business/{business}', fn (Business $business) => response()->json($business))
+        Route::get('/business/{business}', [BusinessProfileController::class, 'show'])
             ->can('view', 'business')
             ->name('business.show');
         Route::put('/business/{business}', fn (Business $business) => response()->json(['message' => 'Profil usaha berhasil diperbarui']))

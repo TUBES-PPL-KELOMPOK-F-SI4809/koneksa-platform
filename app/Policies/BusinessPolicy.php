@@ -31,7 +31,7 @@ class BusinessPolicy
         }
 
         // 3. Pengguna lain hanya dapat melihat profil yang telah dipublikasikan
-        return $business->published_at !== null;
+        return $business->published_at !== null && $business->user?->isEnabled() === true;
     }
 
     /**
