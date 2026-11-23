@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\Inventory\RestockController;
+use App\Http\Controllers\Inventory\StockDashboardController;
+use App\Http\Controllers\Inventory\StockSaleController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Business;
@@ -23,7 +25,11 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function (Request $request) {
+Route::get('/dashboard', function (Request $request, StockDashboardController $stockDashboard) {
+    if ($request->user()->isUmkm()) {
+        return $stockDashboard($request);
+    }
+
     return Inertia::render('Dashboard', [
         'role' => $request->user()->role,
     ]);
@@ -50,8 +56,9 @@ Route::middleware(['auth', 'role:umkm'])
     ->prefix('umkm')
     ->name('umkm.')
     ->group(function () {
-        Route::get('/dashboard', fn () => Inertia::render('Umkm/Dashboard'))->name('dashboard');
+        Route::get('/dashboard', StockDashboardController::class)->name('dashboard');
         Route::get('/inventory', [RestockController::class, 'index'])->name('inventory.index');
+        Route::post('/inventory/sales', [StockSaleController::class, 'store'])->name('inventory.sales.store');
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
