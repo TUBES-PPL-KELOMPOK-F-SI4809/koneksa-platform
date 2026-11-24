@@ -15,20 +15,70 @@ use App\Http\Controllers\PublicBusinessProfileController;
 use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Sale\SalesReportController;
 use App\Models\Business;
+use App\Models\BusinessCategory;
 use App\Models\PartnerProfile;
-use Illuminate\Foundation\Application;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $hasBusinessesTable = Schema::hasTable('businesses');
+
+    $publishedCount = 0;
+    $categoriesCount = 0;
+    $featuredBusinesses = [];
+
+    if ($hasBusinessesTable) {
+        $publishedQuery = Business::query()
+            ->whereNotNull('published_at')
+            ->whereHas('user', fn ($q) => $q->where('account_status', User::STATUS_ENABLED));
+
+        $publishedCount = (clone $publishedQuery)->count();
+        $categoriesCount = Schema::hasTable('business_categories')
+            ? BusinessCategory::count()
+            : 0;
+
+        $hasVerificationTable = Schema::hasTable('verification_requests');
+
+        $featuredBusinesses = (clone $publishedQuery)
+            ->with('category')
+            ->latest('published_at')
+            ->take(3)
+            ->get()
+            ->map(function ($b) use ($hasVerificationTable) {
+                $isVerified = $hasVerificationTable
+                    ? DB::table('verification_requests')
+                        ->where('business_id', $b->id)
+                        ->where('status', 'approved')
+                        ->exists()
+                    : false;
+
+                return [
+                    'id' => $b->id,
+                    'name' => $b->name,
+                    'description' => $b->description,
+                    'district' => $b->district,
+                    'category_name' => $b->category?->name ?? 'Umum',
+                    'is_verified' => $isVerified,
+                    'logo_path' => $b->logo_path,
+                    'business_needs' => $b->business_needs,
+                ];
+            });
+    }
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'stats' => [
+            'businesses_count' => $publishedCount,
+            'categories_count' => $categoriesCount,
+        ],
+        'featured_businesses' => $featuredBusinesses,
     ]);
-});
+})->name('landing');
 
 /*
 |--------------------------------------------------------------------------
