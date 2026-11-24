@@ -4,6 +4,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import UmkmLayout from '@/Layouts/UmkmLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
+import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -17,10 +18,15 @@ const valuesFromBusiness = () => ({
     district: props.business?.district ?? '',
     subdistrict: props.business?.subdistrict ?? '',
     contact_phone: props.business?.contact_phone ?? '',
+    business_needs: props.business?.business_needs ?? '',
+    is_published: Boolean(props.business?.published_at),
 });
 const form = useForm(valuesFromBusiness());
 const errorSummary = ref(null);
 const feedback = ref('');
+const showPublicationConfirmation = ref(false);
+const publicationCancel = ref(null);
+const saveButton = ref(null);
 const categoryName = computed(() => props.categories.find((category) =>
     category.id === Number(form.business_category_id))?.name ?? 'Kategori belum dipilih');
 const businessInitials = computed(() => (form.name.trim() || 'Usaha Anda').split(/\s+/)
@@ -29,7 +35,7 @@ const locationLabel = computed(() => [form.subdistrict, form.district].filter(Bo
 const guideSteps = [
     { title: '1. Isi identitas usaha', description: 'Masukkan nama usaha dan pilih kategori yang paling sesuai.' },
     { title: '2. Lengkapi lokasi dan kontak', description: 'Tambahkan deskripsi, alamat, dan telepon usaha bila tersedia.' },
-    { title: '3. Periksa lalu simpan', description: 'Cek ringkasan isian, lalu simpan profil milik akun Anda.' },
+    { title: '3. Atur kebutuhan dan publikasi', description: 'Jelaskan kebutuhan usaha, pilih draft atau publik, lalu periksa dan simpan.' },
 ];
 
 function focusField(field) {
@@ -45,16 +51,32 @@ function resetChanges() {
     focusField('name');
 }
 
-function submit() {
+async function submit() {
+    if (form.is_published !== Boolean(props.business?.published_at)) {
+        showPublicationConfirmation.value = true;
+        await nextTick();
+        publicationCancel.value?.$el.focus();
+        return;
+    }
+    save();
+}
+
+function restoreFocus() {
+    (form.hasErrors ? errorSummary.value : saveButton.value)?.focus();
+}
+
+function save() {
     feedback.value = '';
     form.put(route('business-profile.update'), {
         preserveScroll: true,
         onSuccess: () => {
             form.defaults(valuesFromBusiness());
             form.reset();
-            feedback.value = 'Profil usaha berhasil disimpan.';
+            showPublicationConfirmation.value = false;
+            feedback.value = `Profil usaha berhasil disimpan. Status: ${form.is_published ? 'Publik' : 'Draft / privat'}.`;
         },
         onError: async () => {
+            showPublicationConfirmation.value = false;
             await nextTick();
             errorSummary.value?.focus();
         },
@@ -65,15 +87,15 @@ function submit() {
 <template>
     <UmkmLayout
         title="Profil Usaha"
-        subtitle="Lengkapi identitas dan informasi usaha agar data bisnis Anda selalu tepat dan mudah diperbarui."
+        subtitle="Kelola identitas, kebutuhan pengembangan, dan publikasi profil usaha Anda."
         guide-title="Panduan profil usaha"
         guide-description="Tiga langkah untuk melengkapi profil usaha Anda."
         :guide-steps="guideSteps"
     >
         <Head title="Profil Usaha" />
         <template #header-actions>
-            <StatusBadge :tone="business ? 'primary' : 'neutral'" size="md" dot>
-                {{ business ? 'Profil tersimpan' : 'Profil baru' }}
+            <StatusBadge :tone="business?.published_at ? 'success' : 'neutral'" size="md" dot>
+                {{ business?.published_at ? 'Profil publik' : 'Draft / privat' }}
             </StatusBadge>
         </template>
 
@@ -158,8 +180,28 @@ function submit() {
                         </div>
                     </fieldset>
 
+                    <fieldset :disabled="form.processing" class="mt-6 min-w-0 border-t border-hairline pt-5">
+                        <legend class="px-1 text-sm font-semibold text-ink">Kebutuhan dan publikasi</legend>
+                        <div class="mt-3">
+                            <InputLabel for="business-business_needs" value="Kebutuhan pengembangan usaha" />
+                            <textarea id="business-business_needs" v-model="form.business_needs" name="business_needs" rows="4" maxlength="10000" placeholder="Contoh: mencari mitra distribusi, pendanaan mesin, atau pendampingan pemasaran." class="mt-2 w-full rounded-lg border-hairline text-sm placeholder:text-ink-muted focus:border-primary-500 focus:ring-primary-500 disabled:opacity-60" :aria-invalid="Boolean(form.errors.business_needs)" aria-describedby="business-needs-help business-business_needs-error"></textarea>
+                            <p id="business-needs-help" class="mt-2 text-xs leading-relaxed text-ink-muted">Jelaskan dukungan yang Anda butuhkan. Kebutuhan ini ikut terlihat saat profil dipublikasikan.</p>
+                            <InputError id="business-business_needs-error" :message="form.errors.business_needs" class="mt-2" />
+                        </div>
+                        <label for="business-is_published" class="mt-5 flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-hairline bg-canvas p-4">
+                            <input id="business-is_published" v-model="form.is_published" name="is_published" type="checkbox" class="mt-1 rounded border-neutral-300 text-primary-600 focus:ring-primary-500" :aria-invalid="Boolean(form.errors.is_published)" aria-describedby="publication-help business-is_published-error" />
+                            <span class="text-sm"><span class="font-semibold">Publikasikan profil usaha</span><span id="publication-help" class="mt-1 block leading-relaxed text-ink-secondary">Aktifkan agar profil dan kebutuhan usaha dapat dilihat pengguna lain. Nonaktifkan untuk menyimpannya sebagai draft / privat.</span></span>
+                        </label>
+                        <InputError id="business-is_published-error" :message="form.errors.is_published" class="mt-2" />
+                        <details class="mt-3 text-sm text-ink-secondary">
+                            <summary class="min-h-11 w-fit cursor-pointer rounded py-3 font-medium text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">Informasi yang dipublikasikan</summary>
+                            <p class="leading-relaxed">Nama, kategori, deskripsi, logo, alamat, kecamatan, kelurahan, telepon usaha, dan kebutuhan pengembangan. Pastikan lokasi dan kontak yang Anda isi memang boleh dibagikan.</p>
+                            <p class="mt-2 leading-relaxed">Data akun, transaksi, keuangan, dan proposal tidak ikut dipublikasikan. Izin indikator performa dikelola terpisah.</p>
+                        </details>
+                    </fieldset>
+
                     <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-hairline pt-5">
-                        <button type="submit" :disabled="form.processing || categories.length === 0" class="min-h-11 rounded-xl bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">{{ form.processing ? 'Menyimpan…' : business ? 'Simpan perubahan' : 'Simpan profil usaha' }}</button>
+                        <button ref="saveButton" type="submit" :disabled="form.processing || categories.length === 0" class="min-h-11 rounded-xl bg-primary-600 px-5 text-sm font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">{{ form.processing ? 'Menyimpan…' : business ? 'Simpan perubahan' : 'Simpan profil usaha' }}</button>
                         <SecondaryButton :disabled="form.processing || !form.isDirty" class="min-h-11 rounded-xl" @click="resetChanges">Reset perubahan</SecondaryButton>
                     </div>
                 </form>
@@ -175,8 +217,13 @@ function submit() {
                             <div class="mt-4"><StatusBadge tone="secondary" size="md" class="max-w-full"><span class="min-w-0 break-words">{{ categoryName }}</span></StatusBadge></div>
                         </div>
                         <div class="p-5 text-sm leading-relaxed">
+                            <StatusBadge :tone="form.is_published ? 'success' : 'neutral'" size="md" dot>{{ form.is_published ? 'Akan ditampilkan publik' : 'Draft / privat' }}</StatusBadge>
                             <p class="line-clamp-4 whitespace-pre-wrap break-words text-ink-secondary">{{ form.description.trim() || 'Deskripsi usaha akan tampil di sini setelah diisi.' }}</p>
                             <p v-if="locationLabel" class="mt-4 break-words font-medium text-ink-secondary">{{ locationLabel }}</p>
+                            <div class="mt-4 rounded-xl bg-canvas p-4">
+                                <h3 class="text-xs font-semibold text-ink-muted">Kebutuhan pengembangan</h3>
+                                <p class="mt-2 line-clamp-4 whitespace-pre-wrap break-words text-ink-secondary">{{ form.business_needs.trim() || 'Belum ada kebutuhan yang ditambahkan.' }}</p>
+                            </div>
                             <details class="mt-4 text-ink-secondary">
                                 <summary class="w-fit cursor-pointer rounded py-1 font-medium text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">Rincian lokasi dan kontak</summary>
                                 <dl class="mt-3 flex flex-col gap-3 rounded-xl bg-canvas p-4">
@@ -194,5 +241,17 @@ function submit() {
                 </aside>
             </div>
         </div>
+        <Modal :show="showPublicationConfirmation" :closeable="!form.processing" max-width="lg" aria-labelledby="publication-confirm-title" aria-describedby="publication-confirm-description" @close="showPublicationConfirmation = false" @closed="restoreFocus">
+            <div class="p-6">
+                <h2 id="publication-confirm-title" class="text-lg font-semibold">{{ form.is_published ? 'Publikasikan profil usaha?' : 'Simpan profil sebagai draft?' }}</h2>
+                <p id="publication-confirm-description" class="mt-3 text-sm leading-relaxed text-ink-secondary">{{ form.is_published ? 'Profil, lokasi, telepon usaha, dan kebutuhan pengembangan akan dapat dilihat pengguna lain. Data transaksi, keuangan, akun, dan proposal tetap privat.' : 'Profil dan kebutuhan pengembangan tidak lagi dapat dilihat pengguna lain. Data usaha tetap tersimpan untuk Anda dan petugas yang berwenang.' }}</p>
+                <p class="mt-3 break-words rounded-xl bg-canvas p-4 text-sm font-semibold">{{ form.name }}</p>
+                <p class="mt-3 text-xs text-ink-muted">Seluruh perubahan form akan ikut disimpan.</p>
+                <div class="mt-6 flex flex-wrap justify-end gap-3">
+                    <SecondaryButton ref="publicationCancel" class="min-h-11" :disabled="form.processing" @click="showPublicationConfirmation = false">Batal</SecondaryButton>
+                    <button type="button" :disabled="form.processing" class="min-h-11 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50" @click="save">{{ form.processing ? 'Menyimpan…' : form.is_published ? 'Ya, publikasikan' : 'Ya, simpan sebagai draft' }}</button>
+                </div>
+            </div>
+        </Modal>
     </UmkmLayout>
 </template>

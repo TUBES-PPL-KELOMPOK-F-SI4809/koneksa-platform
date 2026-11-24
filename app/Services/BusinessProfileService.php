@@ -26,6 +26,11 @@ class BusinessProfileService
                 }
             }
 
+            if (array_key_exists('is_published', $data)) {
+                $data['published_at'] = $data['is_published'] ? ($business?->published_at ?? now()) : null;
+                unset($data['is_published']);
+            }
+
             $user->business()->updateOrCreate([], $data);
         });
     }

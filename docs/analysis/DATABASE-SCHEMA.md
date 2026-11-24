@@ -29,8 +29,18 @@ Untuk tata cara pembuatan migrasi dan model baru, ikuti [panduan pengembangan fi
 ## Profil Usaha (`FR-04.1`, `KSA-15`)
 
 - `GET /business-profile` (`business-profile.edit`) menampilkan profil milik akun UMKM yang sedang login, daftar kategori, dan `identityLocked`. Nilai ini mengikuti pemeriksaan backend yang sudah ada: identitas terkunci jika profil tersebut pernah memiliki pengajuan verifikasi berstatus `approved`.
-- `PUT /business-profile` (`business-profile.update`) membuat atau memperbarui satu profil milik akun melalui `BusinessProfileService`, dengan validasi server dan penguncian dalam transaksi. Form hanya mengirim nama, kategori, deskripsi, alamat, kecamatan, kelurahan, serta telepon usaha.
-- UI mengunci nama, kategori, dan alamat sesuai `identityLocked`; pemeriksaan server tetap berlaku. Pengaturan publikasi/kebutuhan usaha berada pada FR terpisah. Tidak ada perubahan skema untuk pembaruan UI ini.
+- `PUT /business-profile` (`business-profile.update`) membuat atau memperbarui satu profil milik akun melalui `BusinessProfileService`, dengan validasi server dan penguncian dalam transaksi. Data identitas mencakup nama, kategori, deskripsi, alamat, kecamatan, kelurahan, serta telepon usaha.
+- UI mengunci nama, kategori, dan alamat sesuai `identityLocked`; pemeriksaan server tetap berlaku. Kebutuhan dan publikasi mengikuti kontrak FR-04.2 di bawah.
+
+## Kebutuhan dan Publikasi Profil (`FR-04.2`, `KSA-16`)
+
+- Form profil yang sama menerima `business_needs` (opsional, teks maksimal 10.000 karakter; kosong menjadi `null`) dan `is_published` (boolean). Jika `is_published` tidak dikirim, status publikasi lama dipertahankan. Profil baru berstatus draft secara default.
+- `is_published` hanya merupakan input form: `true` mengisi `businesses.published_at` dengan waktu server ketika pertama dipublikasikan, `false` mengosongkannya. Penyimpanan ulang profil publik mempertahankan waktu publikasi. Klien tidak boleh menentukan `user_id`, ID usaha, atau `published_at` melalui form ini.
+- Kolom `business_needs` dan `published_at` sudah ada pada migrasi baseline. Permintaan kolom `is_published` pada subtiket KSA-41 mengacu pada konsep publikasi; tidak dibuat kolom boolean kedua atau tabel kebutuhan terpisah. **FR-23 / KSA-84 wajib memakai `businesses.business_needs` dan status `published_at` yang sama** untuk pencarian/filter peluang; kebutuhan tetap satu sumber data.
+- UI menampilkan status tersimpan, ringkasan kebutuhan, daftar informasi yang dibagikan, serta dialog konfirmasi sebelum perubahan publik/draft disimpan. Konfirmasi ikut menyimpan seluruh isian form. Kebutuhan/publikasi tetap dapat diubah setelah identitas terverifikasi; perubahan identitas terkunci menggagalkan seluruh penyimpanan.
+- Endpoint baca yang sudah ada, `GET /umkm/business/{business}`, mengembalikan model lengkap hanya kepada pemilik. Pembaca UMKM lain hanya menerima `id`, `business_category_id`, `name`, `description`, `address`, `district`, `subdistrict`, `contact_phone`, `logo_path`, dan `business_needs`. Draft dan profil pemilik nonaktif/terhapus ditolak oleh policy. Akses monitoring Pemda tetap melalui endpoint berwenangnya.
+- Publikasi profil tidak membuka data akun, transaksi, keuangan, proposal, atau izin performa. Izin indikator performa berada pada FR-22 / KSA-80. Direktori/detail publik guest (FR-10/FR-11) dan filter kebutuhan (FR-23) belum diimplementasikan oleh tiket ini; integrasinya harus mengikuti status publikasi, daftar field aman, serta syarat pemilik aktif dan belum terhapus.
+- Tidak ada migrasi atau dependensi baru. Test lokal memakai SQLite terisolasi; hasilnya tidak membuktikan konkurensi row-lock MySQL.
 
 ## Katalog dan Arsip Produk (`FR-05.1`, `FR-05.2`, `KSA-19`)
 
