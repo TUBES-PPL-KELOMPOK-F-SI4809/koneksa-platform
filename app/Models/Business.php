@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -91,5 +92,40 @@ class Business extends Model
     public function isVerified(): bool
     {
         return $this->verificationRequests()->where('status', 'approved')->exists();
+    }
+
+    /**
+     * Scope untuk hanya menyertakan profil UMKM terpublikasi dan pemilik akun aktif.
+     */
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->whereNotNull('published_at')
+            ->whereHas('user', function (Builder $q) {
+                $q->where('account_status', User::STATUS_ENABLED);
+            });
+    }
+
+    /**
+     * Scope filter pencarian berdasarkan nama usaha (FR-10.2).
+     */
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        if (empty($term)) {
+            return $query;
+        }
+
+        return $query->where('name', 'like', "%{$term}%");
+    }
+
+    /**
+     * Scope filter berdasarkan kategori usaha.
+     */
+    public function scopeCategory(Builder $query, mixed $categoryId): Builder
+    {
+        if (empty($categoryId)) {
+            return $query;
+        }
+
+        return $query->where('business_category_id', $categoryId);
     }
 }

@@ -10,7 +10,10 @@ use App\Http\Controllers\Inventory\StockDashboardController;
 use App\Http\Controllers\Inventory\StockSaleController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicBusinessDirectoryController;
 use App\Http\Controllers\PublicBusinessProfileController;
+use App\Http\Controllers\Sale\SaleController;
+use App\Http\Controllers\Sale\SalesReportController;
 use App\Models\Business;
 use App\Models\PartnerProfile;
 use Illuminate\Foundation\Application;
@@ -27,11 +30,15 @@ Route::get('/', function () {
     ]);
 });
 
-// Modul Direktori Publik & Detail Profil UMKM (FR-11 / KSA-68)
-Route::get('/businesses/{business}', [PublicBusinessProfileController::class, 'show'])
-    ->name('public.businesses.show');
-Route::get('/direktori/{business}', [PublicBusinessProfileController::class, 'show'])
-    ->name('direktori.show');
+/*
+|--------------------------------------------------------------------------
+| Direktori Publik UMKM & Detail Profil (FR-10 / KSA-156, FR-11 / KSA-68)
+|--------------------------------------------------------------------------
+*/
+Route::get('/businesses', [PublicBusinessDirectoryController::class, 'index'])->name('businesses.index');
+Route::get('/direktori', [PublicBusinessDirectoryController::class, 'index'])->name('direktori.index');
+Route::get('/businesses/{business}', [PublicBusinessProfileController::class, 'show'])->name('public.businesses.show');
+Route::get('/direktori/{business}', [PublicBusinessProfileController::class, 'show'])->name('direktori.show');
 
 Route::get('/dashboard', function (Request $request, StockDashboardController $stockDashboard) {
     if ($request->user()->isUmkm()) {
@@ -72,6 +79,12 @@ Route::middleware(['auth', 'role:umkm'])
         Route::get('/dashboard', StockDashboardController::class)->name('dashboard');
         Route::get('/inventory', [RestockController::class, 'index'])->name('inventory.index');
         Route::post('/inventory/sales', [StockSaleController::class, 'store'])->name('inventory.sales.store');
+        Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
+        Route::get('/sales/report', [SalesReportController::class, 'index'])->name('sales.report');
+        Route::get('/sales/report/export', [SalesReportController::class, 'export'])->name('sales.report.export');
+        Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+        Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+        Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
