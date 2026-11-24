@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\SupervisionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BusinessProfileController;
+use App\Http\Controllers\CollaborationProposalController;
 use App\Http\Controllers\Inventory\RestockController;
 use App\Http\Controllers\Inventory\StockDashboardController;
 use App\Http\Controllers\Inventory\StockSaleController;
@@ -57,6 +58,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Modul Proposal Kolaborasi Bisnis (FR-12 / KSA-88)
+    Route::get('/proposals', [CollaborationProposalController::class, 'index'])->name('proposals.index');
+    Route::post('/proposals', [CollaborationProposalController::class, 'store'])->name('proposals.store');
+    Route::post('/proposals/{proposal}/respond', [CollaborationProposalController::class, 'respond'])->name('proposals.respond');
 });
 
 /*
