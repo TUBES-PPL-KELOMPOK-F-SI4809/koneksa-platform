@@ -16,13 +16,10 @@ class CollaborationProposalTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createCooperationType(string $name = 'Distribusi & Reseller', string $code = 'distribution'): CooperationType
+    private function createCooperationType(string $name = 'Distribusi & Reseller'): CooperationType
     {
-        return CooperationType::create([
+        return CooperationType::firstOrCreate([
             'name' => $name,
-            'code' => $code,
-            'description' => 'Kerja sama distribusi pasokan barang retail.',
-            'is_active' => true,
         ]);
     }
 

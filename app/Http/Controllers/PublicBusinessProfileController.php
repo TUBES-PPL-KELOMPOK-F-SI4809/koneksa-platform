@@ -131,7 +131,7 @@ class PublicBusinessProfileController extends Controller
             'proposal_action' => $proposalAction,
         ];
 
-        $cooperationTypes = CooperationType::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'description']);
+        $cooperationTypes = CooperationType::orderBy('name')->get(['id', 'name']);
 
         if ($request->wantsJson()) {
             return response()->json([
