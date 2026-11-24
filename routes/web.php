@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventory\StockSaleController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Sale\SaleController;
+use App\Http\Controllers\Sale\SalesReportController;
 use App\Models\Business;
 use App\Models\PartnerProfile;
 use Illuminate\Foundation\Application;
@@ -61,6 +62,8 @@ Route::middleware(['auth', 'role:umkm'])
         Route::get('/inventory', [RestockController::class, 'index'])->name('inventory.index');
         Route::post('/inventory/sales', [StockSaleController::class, 'store'])->name('inventory.sales.store');
         Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
+        Route::get('/sales/report', [SalesReportController::class, 'index'])->name('sales.report');
+        Route::get('/sales/report/export', [SalesReportController::class, 'export'])->name('sales.report.export');
         Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
         Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
         Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
