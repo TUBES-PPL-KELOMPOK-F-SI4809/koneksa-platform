@@ -9,6 +9,7 @@ use App\Http\Controllers\Inventory\StockDashboardController;
 use App\Http\Controllers\Inventory\StockSaleController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicBusinessDirectoryController;
 use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Sale\SalesReportController;
 use App\Models\Business;
@@ -26,6 +27,14 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Direktori Publik UMKM (FR-10 / KSA-156)
+|--------------------------------------------------------------------------
+*/
+Route::get('/businesses', [PublicBusinessDirectoryController::class, 'index'])->name('businesses.index');
+Route::get('/direktori', [PublicBusinessDirectoryController::class, 'index'])->name('direktori.index');
 
 Route::get('/dashboard', function (Request $request, StockDashboardController $stockDashboard) {
     if ($request->user()->isUmkm()) {
