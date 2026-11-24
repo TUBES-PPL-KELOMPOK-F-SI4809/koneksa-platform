@@ -17,4 +17,3 @@ class CooperationType extends Model
         return $this->hasMany(CollaborationProposal::class);
     }
 }
-

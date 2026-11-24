@@ -71,4 +71,3 @@ class CollaborationProposalPolicy
         return $proposal->isRecipient($user);
     }
 }
-

@@ -358,4 +358,3 @@ class CollaborationProposalTest extends TestCase
         $response->assertForbidden();
     }
 }
-

@@ -182,4 +182,3 @@ class CollaborationProposalController extends Controller
         return redirect()->back()->with('success', $message);
     }
 }
-
