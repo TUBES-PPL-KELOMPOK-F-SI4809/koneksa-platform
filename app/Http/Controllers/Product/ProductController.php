@@ -30,7 +30,12 @@ class ProductController extends Controller
                 ->when($status === 'active', fn (Builder $query) => $query->whereNull('archived_at'))
                 ->when($status === 'archived', fn (Builder $query) => $query->whereNotNull('archived_at'))
                 ->when($search !== '', fn (Builder $query) => $query->where('name', 'like', '%'.$search.'%'))
-                ->orderByDesc('id')->paginate(12)->withQueryString(),
+                ->orderByDesc('id')->paginate(12)->withQueryString()
+                ->through(function (Product $product): Product {
+                    $product->variants->each->append('stock_status');
+
+                    return $product;
+                }),
             'counts' => ['active' => (clone $owned)->whereNull('archived_at')->count(), 'archived' => (clone $owned)->whereNotNull('archived_at')->count()],
             'hasBusiness' => $request->user()->business()->exists(),
             'filters' => ['search' => $search, 'status' => $status],

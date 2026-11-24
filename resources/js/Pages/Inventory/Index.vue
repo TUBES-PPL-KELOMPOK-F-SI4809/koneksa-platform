@@ -4,6 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import UmkmLayout from '@/Layouts/UmkmLayout.vue';
 import StatCard from '@/Components/StatCard.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
+import StockBadge from '@/Components/StockBadge.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -129,7 +130,7 @@ onUnmounted(() => document.removeEventListener('keydown', focusSearch));
                                     <p v-if="variant.size || variant.color">{{ [variant.size, variant.color].filter(Boolean).join(' · ') }}</p>
                                 </details>
                             </div>
-                            <p class="text-sm font-semibold tabular-nums text-ink">{{ formatNumber(variant.stock_quantity) }} <span class="font-normal text-ink-muted">{{ variant.product.unit }}</span></p>
+                            <div class="flex flex-col items-start gap-2"><p class="text-sm font-semibold tabular-nums text-ink">{{ formatNumber(variant.stock_quantity) }} <span class="font-normal text-ink-muted">{{ variant.product.unit }}</span></p><StockBadge :status="variant.stock_status" /><p class="text-xs text-ink-muted">Batas: {{ formatNumber(variant.low_stock_threshold) }} {{ variant.product.unit }}</p></div>
                             <button :id="`restock-${variant.id}`" type="button" class="min-h-11 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-50" :aria-label="`Tambah stok ${variant.product.name}, ${variantLabel(variant)}`" :disabled="form.processing" @click="selectVariant(variant)">+ Tambah stok</button>
                         </li>
                     </ul>

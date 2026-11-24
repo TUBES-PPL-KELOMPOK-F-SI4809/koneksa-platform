@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,22 @@ class ProductVariant extends Model
     {
         $query->whereNull('archived_at')
             ->whereHas('product', fn (Builder $product) => $product->whereNull('archived_at'));
+    }
+
+    #[Scope]
+    protected function lowStock(Builder $query): void
+    {
+        $query->availableForSale()->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
+    }
+
+    protected function stockStatus(): Attribute
+    {
+        return Attribute::get(fn (): string => match (true) {
+            $this->archived_at !== null => 'archived',
+            $this->stock_quantity === 0 => 'out',
+            $this->stock_quantity <= $this->low_stock_threshold => 'low',
+            default => 'healthy',
+        });
     }
 
     protected function casts(): array

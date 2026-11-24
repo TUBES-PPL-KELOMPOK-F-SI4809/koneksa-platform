@@ -5,6 +5,7 @@ import UmkmLayout from '@/Layouts/UmkmLayout.vue';
 import Modal from '@/Components/Modal.vue';
 import StatCard from '@/Components/StatCard.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
+import StockBadge from '@/Components/StockBadge.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import ProductForm from './Partials/ProductForm.vue';
@@ -103,7 +104,7 @@ onUnmounted(() => document.removeEventListener('keydown', shortcut));
                         <div class="grid items-center gap-3 lg:grid-cols-12">
                             <div class="min-w-0 lg:col-span-5"><h3 class="break-words text-sm font-semibold">{{ product.name }}</h3><p class="mt-1 text-sm text-ink-muted">{{ product.variants.length }} varian · per {{ product.unit }}</p></div>
                             <p class="break-words text-sm font-medium tabular-nums lg:col-span-4">{{ price(product) }}</p>
-                            <div class="lg:col-span-3 lg:text-right"><StatusBadge :tone="product.archived_at ? 'neutral' : 'success'" dot size="md">{{ product.archived_at ? 'Diarsipkan' : 'Aktif' }}</StatusBadge></div>
+                            <div class="flex flex-wrap gap-2 lg:col-span-3 lg:justify-end"><StatusBadge :tone="product.archived_at ? 'neutral' : 'success'" dot size="md">{{ product.archived_at ? 'Diarsipkan' : 'Aktif' }}</StatusBadge><StockBadge v-if="!product.archived_at && product.variants.some((variant) => ['out', 'low'].includes(variant.stock_status))" :status="product.variants.some((variant) => variant.stock_status === 'out') ? 'out' : 'low'" /></div>
                         </div>
                         <details class="mt-2 text-sm">
                             <summary class="w-fit min-h-11 cursor-pointer rounded-lg py-3 text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">Rincian <span class="sr-only">{{ product.name }}</span></summary>
@@ -112,6 +113,7 @@ onUnmounted(() => document.removeEventListener('keydown', shortcut));
                                 <ul class="flex flex-col gap-3">
                                     <li v-for="variant in product.variants" :key="variant.id" class="rounded-lg border border-hairline bg-white p-3">
                                         <div class="flex flex-wrap justify-between gap-2"><span class="break-words font-medium">{{ variant.variant_key === 'default' ? 'Varian standar' : variant.variant_key }}</span><span class="tabular-nums">{{ rupiah(variant.selling_price) }}</span></div>
+                                        <div class="mt-2"><StockBadge :status="product.archived_at ? 'archived' : variant.stock_status" /></div>
                                         <p class="mt-2 break-words text-ink-secondary">Stok {{ variant.stock_quantity }} {{ product.unit }} · Batas stok rendah {{ variant.low_stock_threshold }}</p>
                                         <p v-if="variant.sku || variant.size || variant.color" class="mt-1 break-words text-ink-muted">{{ [variant.sku && `SKU: ${variant.sku}`, variant.size, variant.color].filter(Boolean).join(' · ') }}</p>
                                         <p v-if="variant.archived_at" class="mt-1 text-warning-dark">Varian diarsipkan</p>

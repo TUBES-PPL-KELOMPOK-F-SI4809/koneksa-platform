@@ -25,9 +25,10 @@ class RestockController extends Controller
             'variants' => ProductVariant::with('product:id,name,unit')
                 ->whereHas('product', $ownedProduct)
                 ->availableForSale()
-                ->select(['id', 'product_id', 'variant_key', 'sku', 'size', 'color', 'stock_quantity'])
+                ->select(['id', 'product_id', 'variant_key', 'sku', 'size', 'color', 'stock_quantity', 'low_stock_threshold'])
                 ->orderBy('product_id')->orderBy('id')
-                ->paginate(12, pageName: 'stock_page')->withQueryString(),
+                ->paginate(12, pageName: 'stock_page')->withQueryString()
+                ->through(fn (ProductVariant $variant) => $variant->append('stock_status')),
             'movements' => StockMovement::with([
                 'productVariant:id,product_id,variant_key,sku,size,color',
                 'productVariant.product:id,name,unit',
