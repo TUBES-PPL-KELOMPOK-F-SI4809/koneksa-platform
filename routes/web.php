@@ -9,6 +9,7 @@ use App\Http\Controllers\Inventory\StockDashboardController;
 use App\Http\Controllers\Inventory\StockSaleController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicBusinessProfileController;
 use App\Models\Business;
 use App\Models\PartnerProfile;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,12 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// Modul Direktori Publik & Detail Profil UMKM (FR-11 / KSA-68)
+Route::get('/businesses/{business}', [PublicBusinessProfileController::class, 'show'])
+    ->name('public.businesses.show');
+Route::get('/direktori/{business}', [PublicBusinessProfileController::class, 'show'])
+    ->name('direktori.show');
 
 Route::get('/dashboard', function (Request $request, StockDashboardController $stockDashboard) {
     if ($request->user()->isUmkm()) {

@@ -46,6 +46,11 @@ class ProductVariant extends Model
         ];
     }
 
+    public function isLowStock(): bool
+    {
+        return $this->stock_quantity <= $this->low_stock_threshold;
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

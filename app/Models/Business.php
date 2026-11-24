@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'user_id',
@@ -50,5 +51,37 @@ class Business extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(BusinessCategory::class, 'business_category_id');
+    }
+
+    /**
+     * Katalog produk milik usaha.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Riwayat transaksi penjualan usaha.
+     */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    /**
+     * Riwayat pengajuan verifikasi administratif ke Pemda.
+     */
+    public function verificationRequests(): HasMany
+    {
+        return $this->hasMany(VerificationRequest::class);
+    }
+
+    /**
+     * Tentukan apakah usaha telah terverifikasi oleh Pemda.
+     */
+    public function isVerified(): bool
+    {
+        return $this->verificationRequests()->where('status', 'approved')->exists();
     }
 }
