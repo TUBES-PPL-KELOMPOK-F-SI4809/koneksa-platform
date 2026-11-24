@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import KoneksaLogo from '@/Components/KoneksaLogo.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
 import StatCard from '@/Components/StatCard.vue';
@@ -13,14 +13,24 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    cooperation_types: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const expandedProductId = ref(null);
 const showProposalModal = ref(false);
-const proposalScope = ref('Distribusi & Reseller');
-const proposalNote = ref('');
 const proposalSuccessMessage = ref('');
 const productSearch = ref('');
+
+const proposalForm = useForm({
+    business_id: props.business.id,
+    partner_profile_id: null,
+    cooperation_type_id: '',
+    title: '',
+    description: '',
+});
 
 function toggleProductVariants(productId) {
     expandedProductId.value = expandedProductId.value === productId ? null : productId;
@@ -64,14 +74,24 @@ const verificationTone = computed(() => {
 function openProposalAction() {
     showProposalModal.value = true;
     proposalSuccessMessage.value = '';
+    proposalForm.clearErrors();
+    proposalForm.business_id = props.business.id;
+    if (!proposalForm.title) {
+        proposalForm.title = `Proposal Kerja Sama dengan ${props.business.name}`;
+    }
+    if (!proposalForm.cooperation_type_id && props.cooperation_types.length > 0) {
+        proposalForm.cooperation_type_id = props.cooperation_types[0].id;
+    }
 }
 
-function submitProposalSimulated() {
-    if (!proposalNote.value.trim()) {
-        return;
-    }
-    proposalSuccessMessage.value = `Pengajuan proposal kerja sama "${proposalScope.value}" ke ${props.business.name} berhasil dicatat.`;
-    proposalNote.value = '';
+function submitProposal() {
+    proposalForm.post(route('proposals.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            proposalSuccessMessage.value = `Proposal kerja sama berhasil diajukan kepada ${props.business.name}. Anda dapat memantau proses review di menu Proposal.`;
+            proposalForm.reset('description');
+        },
+    });
 }
 </script>
 
@@ -504,45 +524,90 @@ function submitProposalSimulated() {
                         </button>
                     </div>
 
-                    <div v-if="proposalSuccessMessage" class="mt-4 rounded-xl bg-success-light p-4 text-xs font-medium text-success-dark">
-                        {{ proposalSuccessMessage }}
+                    <div v-if="proposalSuccessMessage" class="mt-4 rounded-xl bg-success-light p-5 text-center">
+                        <div class="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-success text-white">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <p class="text-xs font-semibold text-success-dark">
+                            {{ proposalSuccessMessage }}
+                        </p>
+                        <div class="mt-4 flex justify-center gap-2">
+                            <Link
+                                :href="route('proposals.index')"
+                                class="inline-flex h-9 items-center rounded-xl bg-primary-600 px-4 text-xs font-medium text-white hover:bg-primary-500 transition"
+                            >
+                                Buka Daftar Proposal &rarr;
+                            </Link>
+                            <SecondaryButton @click="showProposalModal = false">Tutup</SecondaryButton>
+                        </div>
                     </div>
 
-                    <form v-else class="mt-4 space-y-4" @submit.prevent="submitProposalSimulated">
+                    <form v-else class="mt-4 space-y-4" @submit.prevent="submitProposal">
                         <div>
-                            <label for="proposal-scope" class="block text-xs font-semibold text-ink mb-1">
-                                Bentuk Kolaborasi
+                            <label for="proposal-title" class="block text-xs font-semibold text-ink mb-1">
+                                Judul Proposal Kerja Sama <span class="text-danger-500">*</span>
                             </label>
-                            <select
-                                id="proposal-scope"
-                                v-model="proposalScope"
+                            <input
+                                id="proposal-title"
+                                v-model="proposalForm.title"
+                                type="text"
+                                placeholder="Contoh: Kerja Sama Distribusi Produk Retail Kopi Braga"
                                 class="h-10 w-full rounded-xl border border-hairline bg-canvas px-3 text-xs text-ink focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
-                            >
-                                <option value="Distribusi & Reseller">Distribusi &amp; Penjualan Ulang</option>
-                                <option value="Produksi Private Label">Produksi Private Label (Maklon)</option>
-                                <option value="Dukungan Pendanaan & Modal">Dukungan Modal &amp; Pendanaan</option>
-                                <option value="Adopsi Solusi Digital">Adopsi Solusi Digital &amp; Otomasi</option>
-                                <option value="Pelatihan & Pendampingan">Pelatihan &amp; Pendampingan Usaha</option>
-                            </select>
+                                required
+                            />
+                            <p v-if="proposalForm.errors.title" class="mt-1 text-xs text-danger-500">
+                                {{ proposalForm.errors.title }}
+                            </p>
                         </div>
 
                         <div>
-                            <label for="proposal-note" class="block text-xs font-semibold text-ink mb-1">
-                                Rincian Usulan &amp; Nilai Tambah
+                            <label for="proposal-cooperation-type" class="block text-xs font-semibold text-ink mb-1">
+                                Jenis Kerja Sama <span class="text-danger-500">*</span>
+                            </label>
+                            <select
+                                id="proposal-cooperation-type"
+                                v-model="proposalForm.cooperation_type_id"
+                                class="h-10 w-full rounded-xl border border-hairline bg-canvas px-3 text-xs text-ink focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
+                                required
+                            >
+                                <option value="" disabled>Pilih Jenis Kerja Sama...</option>
+                                <option
+                                    v-for="ctype in cooperation_types"
+                                    :key="ctype.id"
+                                    :value="ctype.id"
+                                >
+                                    {{ ctype.name }}
+                                </option>
+                            </select>
+                            <p v-if="proposalForm.errors.cooperation_type_id" class="mt-1 text-xs text-danger-500">
+                                {{ proposalForm.errors.cooperation_type_id }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <label for="proposal-description" class="block text-xs font-semibold text-ink mb-1">
+                                Rincian Penawaran &amp; Nilai Tambah <span class="text-danger-500">*</span>
                             </label>
                             <textarea
-                                id="proposal-note"
-                                v-model="proposalNote"
-                                rows="3"
-                                placeholder="Jelaskan secara ringkas maksud kerja sama, estimasi volume pasokan, atau skema kolaborasi yang ditawarkan..."
+                                id="proposal-description"
+                                v-model="proposalForm.description"
+                                rows="4"
+                                placeholder="Jelaskan secara rinci maksud kerja sama, skema penawaran, proyeksi volume pasokan, atau nilai tambah bagi UMKM..."
                                 class="w-full rounded-xl border border-hairline bg-canvas p-3 text-xs text-ink placeholder-ink-muted focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
                                 required
                             ></textarea>
+                            <p v-if="proposalForm.errors.description" class="mt-1 text-xs text-danger-500">
+                                {{ proposalForm.errors.description }}
+                            </p>
                         </div>
 
                         <div class="flex items-center justify-end gap-2 pt-2">
                             <SecondaryButton @click="showProposalModal = false">Batal</SecondaryButton>
-                            <PrimaryButton type="submit">Kirim Proposal</PrimaryButton>
+                            <PrimaryButton type="submit" :disabled="proposalForm.processing">
+                                {{ proposalForm.processing ? 'Mengirim...' : 'Kirim Proposal' }}
+                            </PrimaryButton>
                         </div>
                     </form>
                 </template>

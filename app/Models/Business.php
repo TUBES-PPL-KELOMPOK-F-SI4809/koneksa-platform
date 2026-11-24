@@ -78,6 +78,14 @@ class Business extends Model
     }
 
     /**
+     * Riwayat proposal kolaborasi bisnis (FR-12).
+     */
+    public function collaborationProposals(): HasMany
+    {
+        return $this->hasMany(CollaborationProposal::class);
+    }
+
+    /**
      * Tentukan apakah usaha telah terverifikasi oleh Pemda.
      */
     public function isVerified(): bool

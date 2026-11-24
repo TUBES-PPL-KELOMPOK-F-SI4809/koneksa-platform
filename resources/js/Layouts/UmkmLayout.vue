@@ -37,6 +37,7 @@ const navigation = [
     { label: 'Profil usaha', name: 'business-profile.edit', icon: 'M3 21h18M5 21V4h14v17M9 8h1m4 0h1M9 12h1m4 0h1M10 21v-5h4v5' },
     { label: 'Produk', name: 'umkm.products.index', icon: 'M3 7h18M5 7V4h14v3M5 7v13h14V7M9 11h6' },
     { label: 'Persediaan', name: 'umkm.inventory.index', icon: 'm3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10' },
+    { label: 'Proposal kolaborasi', name: 'proposals.index', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
     { label: 'Profil akun', name: 'profile.edit', icon: 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20a7.5 7.5 0 0 1 15 0' },
 ];
 const filteredNavigation = computed(() => navigation.filter((item) =>

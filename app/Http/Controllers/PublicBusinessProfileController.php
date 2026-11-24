@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\CooperationType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -130,12 +131,18 @@ class PublicBusinessProfileController extends Controller
             'proposal_action' => $proposalAction,
         ];
 
+        $cooperationTypes = CooperationType::where('is_active', true)->orderBy('name')->get(['id', 'name', 'code', 'description']);
+
         if ($request->wantsJson()) {
-            return response()->json(['business' => $payload]);
+            return response()->json([
+                'business' => $payload,
+                'cooperation_types' => $cooperationTypes,
+            ]);
         }
 
         return Inertia::render('Public/BusinessDetail', [
             'business' => $payload,
+            'cooperation_types' => $cooperationTypes,
         ]);
     }
 }
