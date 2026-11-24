@@ -48,4 +48,9 @@ class VerificationRequest extends Model
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
+
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
 }
