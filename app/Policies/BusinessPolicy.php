@@ -18,19 +18,24 @@ class BusinessPolicy
     /**
      * Tentukan apakah pengguna dapat melihat profil usaha spesifik.
      */
-    public function view(User $user, Business $business): bool
+    public function view(?User $user, Business $business): bool
     {
-        // 1. Pemilik usaha selalu dapat melihat miliknya
-        if ($business->user_id === $user->id) {
+        // 1. Jika terautentikasi dan akun non-aktif, tolak
+        if ($user !== null && ! $user->isEnabled()) {
+            return false;
+        }
+
+        // 2. Pemilik usaha selalu dapat melihat miliknya
+        if ($user !== null && $business->user_id === $user->id) {
             return true;
         }
 
-        // 2. Superadmin dan Pemda dapat melihat untuk audit & monitoring
-        if ($user->isAdmin() || $user->isPemda()) {
+        // 3. Superadmin dan Pemda dapat melihat untuk audit & monitoring
+        if ($user !== null && ($user->isAdmin() || $user->isPemda())) {
             return true;
         }
 
-        // 3. Pengguna lain hanya dapat melihat profil yang telah dipublikasikan
+        // 4. Pengunjung publik dan mitra/pengguna aktif lain hanya dapat melihat profil yang telah dipublikasikan
         return $business->published_at !== null && $business->user?->isEnabled() === true;
     }
 
