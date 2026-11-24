@@ -55,11 +55,35 @@ class Business extends Model
     }
 
     /**
-     * Riwayat pengajuan verifikasi administratif profil.
+     * Katalog produk milik usaha.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Riwayat transaksi penjualan usaha.
+     */
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    /**
+     * Riwayat pengajuan verifikasi administratif ke Pemda.
      */
     public function verificationRequests(): HasMany
     {
         return $this->hasMany(VerificationRequest::class);
+    }
+
+    /**
+     * Tentukan apakah usaha telah terverifikasi oleh Pemda.
+     */
+    public function isVerified(): bool
+    {
+        return $this->verificationRequests()->where('status', 'approved')->exists();
     }
 
     /**
