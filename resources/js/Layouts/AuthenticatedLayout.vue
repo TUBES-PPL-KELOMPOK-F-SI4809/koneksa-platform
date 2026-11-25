@@ -51,6 +51,13 @@ const showingNavigationDropdown = ref(false);
                                 </NavLink>
                                 <NavLink v-if="$page.props.auth.user?.role === 'umkm'" :href="route('umkm.products.index')" :active="route().current('umkm.products.*')">Produk</NavLink>
                                 <NavLink
+                                    v-if="['umkm', 'mitra', 'admin'].includes($page.props.auth.user?.role)"
+                                    :href="route('proposals.index')"
+                                    :active="route().current('proposals.*')"
+                                >
+                                    Proposal Kolaborasi
+                                </NavLink>
+                                <NavLink
                                     v-if="$page.props.auth.user?.role === 'admin'"
                                     :href="route('admin.supervision.index')"
                                     :active="route().current('admin.supervision.index')"
@@ -202,6 +209,13 @@ const showingNavigationDropdown = ref(false);
                             Persediaan
                         </ResponsiveNavLink>
                         <ResponsiveNavLink v-if="$page.props.auth.user?.role === 'umkm'" :href="route('umkm.products.index')" :active="route().current('umkm.products.*')">Produk</ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="['umkm', 'mitra', 'admin'].includes($page.props.auth.user?.role)"
+                            :href="route('proposals.index')"
+                            :active="route().current('proposals.*')"
+                        >
+                            Proposal Kolaborasi
+                        </ResponsiveNavLink>
                     </div>
 
                     <!-- Responsive Settings Options -->
