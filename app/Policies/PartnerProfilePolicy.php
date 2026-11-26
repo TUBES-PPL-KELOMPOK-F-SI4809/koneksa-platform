@@ -16,6 +16,18 @@ class PartnerProfilePolicy
     }
 
     /**
+ * Mitra aktif, terverifikasi, dan tidak wajib ganti password
+ * boleh mengelola profil organisasinya (FR-16).
+ */
+public function manage(User $user): bool
+{
+    return $user->isMitra()
+        && $user->isEnabled()
+        && $user->email_verified_at !== null
+        && ! $user->must_change_password;
+}
+
+    /**
      * Tentukan apakah pengguna dapat melihat profil mitra industri spesifik.
      */
     public function view(User $user, PartnerProfile $partnerProfile): bool
