@@ -8,6 +8,7 @@ use App\Http\Controllers\CollaborationProposalController;
 use App\Http\Controllers\Inventory\RestockController;
 use App\Http\Controllers\Inventory\StockDashboardController;
 use App\Http\Controllers\Inventory\StockSaleController;
+use App\Http\Controllers\PartnerProfile\PartnerProfileController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicBusinessDirectoryController;
@@ -16,7 +17,6 @@ use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Sale\SalesReportController;
 use App\Models\Business;
 use App\Models\BusinessCategory;
-use App\Models\PartnerProfile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -157,13 +157,17 @@ Route::middleware(['auth', 'role:mitra'])
     ->name('mitra.')
     ->group(function () {
         Route::get('/dashboard', fn () => Inertia::render('Mitra/Dashboard'))->name('dashboard');
-        Route::get('/profile/{partnerProfile}', fn (PartnerProfile $partnerProfile) => response()->json($partnerProfile))
+
+        // Profil Organisasi Mitra (FR-16 / KSA-72)
+        Route::get('/profile', [PartnerProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile', [PartnerProfileController::class, 'store'])->name('profile.store');
+        Route::get('/profile/{partnerProfile}', [PartnerProfileController::class, 'show'])
             ->can('view', 'partnerProfile')
             ->name('profile.show');
-        Route::put('/profile/{partnerProfile}', fn (PartnerProfile $partnerProfile) => response()->json(['message' => 'Profil organisasi mitra berhasil diperbarui']))
+        Route::put('/profile/{partnerProfile}', [PartnerProfileController::class, 'update'])
             ->can('update', 'partnerProfile')
             ->name('profile.update');
-        Route::delete('/profile/{partnerProfile}', fn (PartnerProfile $partnerProfile) => response()->json(['message' => 'Profil organisasi mitra berhasil dihapus']))
+        Route::delete('/profile/{partnerProfile}', [PartnerProfileController::class, 'destroy'])
             ->can('delete', 'partnerProfile')
             ->name('profile.destroy');
     });
