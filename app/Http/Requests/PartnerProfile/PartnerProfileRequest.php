@@ -68,4 +68,3 @@ abstract class PartnerProfileRequest extends FormRequest
         ];
     }
 }
-

@@ -30,4 +30,3 @@ class PartnerProfileFactory extends Factory
         ];
     }
 }
-

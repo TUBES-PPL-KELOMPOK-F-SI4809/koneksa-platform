@@ -22,4 +22,3 @@ class UpdatePartnerProfileRequest extends PartnerProfileRequest
         return $this->sharedRules(isCreate: false);
     }
 }
-

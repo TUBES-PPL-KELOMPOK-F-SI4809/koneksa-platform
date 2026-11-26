@@ -19,4 +19,3 @@ class StorePartnerProfileRequest extends PartnerProfileRequest
         return $this->sharedRules(isCreate: true);
     }
 }
-
